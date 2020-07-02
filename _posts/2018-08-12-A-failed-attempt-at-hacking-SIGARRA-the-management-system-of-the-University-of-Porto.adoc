@@ -1,0 +1,148 @@
+---
+header: https://user-images.githubusercontent.com/3010353/44003090-d3d3ead2-9e44-11e8-90c3-bd8ec9c204cf.jpg
+published_at: 2018-08-12 00:00:00
+tags: [Hack, SIGARRA, SQL_Injection]
+---
+
+# A failed attempt at hacking SIGARRA, the management system of the University of Porto
+
+SIGARRA is the Information System for the Aggregated Management of Resources and Academic Records of the University of Porto. It serves 30000+ students, as well as professors and other employees.
+
+As part of my work on my master's thesis, I sometimes consulted similar works from previous students, by accessing the list of previous dissertations of my course, available at https://sigarra.up.pt/feup/pt/teses.lista_teses?p_curso=742.
+
+.List of previous dissertations
+image::https://user-images.githubusercontent.com/3010353/44003144-29f40a86-9e46-11e8-8578-fa804c9c875d.png[List of previous dissertations]
+
+Each entry on the list contains the title of the document, the name of the student, some relevant dates and the name of the supervisor. On the right side of the page, a sidebar allows the user to filter the entries, change the sorting method, change the number of entries per page or export them to an Excel file. When you chose to change the ordering of the list a couple of parameters are added to the URL, one of them being "p_ord_campo", which translates to "order field parameter" and defines the name of the field that will be considered for sorting. The options in the sidebar allow us to change this field to one of the following values:
+
+- NOME (author's name)
+- TITULO (document title)
+- GRAU (type of degree)
+
+However, this input field was not properly sanitized, which meant that it was possible to write malicious SQL code instead of those expected values, therefore performing a https://www.owasp.org/index.php/SQL_Injection[SQL Injection] attack.
+
+*But how did I know that the field was vulnerable and how could it be exploited?* A possible way of defining a query to provide the data displayed on the list of dissertations would be as follows:
+
+----
+SELECT * FROM thesis ORDER BY TITULO ASC
+----
+
+If, in the above query, we replace the word `TITULO` by the name of a different field, the resulting page outputs the same list but sorted in a different manner. If the field is vulnerable and the input is not properly sanitized, it is possible to build a query that sorts the list in different ways depending on the output of a subquery:
+
+----
+SELECT * FROM thesis ORDER BY
+CASE WHEN (
+  SELECT 1 FROM dual
+) > 0
+THEN
+  NOME
+ELSE
+  TITULO
+END
+----
+
+The subquery `SELECT 1 FROM dual` always returns a single row with value 1. Since 1 is greater than zero, the list of thesis gets sorted by the field NOME. Likewise, if we change the subquery to return the value 0, the list gets sorted by the field TITULO. Doing this test, it can be concluded that our SQL injected code is indeed being executed and that we have found a method of reading the value of any SQL statement we define, as long as it returns a binary value. Therefore, it should be possible to access sensitive data stored in SIGARRA's database, such as a personal e-mail adddress, by filling the "p_ord_campo" field with a string such as:
+
+---- 
+CASE WHEN (
+  SELECT personal_email FROM user_accounts WHERE user_code = 'up201304143'
+) > 'a'
+THEN
+  NOME
+ELSE
+  TITULO
+END
+----
+
+SIGARRA runs an Oracle Database. In Oracle SQL, the `>` operator, when used with strings, returns true if the first string comes after the second one alphabetically. With this input, if the first char of the e-mail address of user "up201304143" has a higher value than the value of "a" in the https://en.wikipedia.org/wiki/ASCII[ASCII table], then the list of thesis gets sorted by the field NOME, otherwise it gets sorted by the field TITULO. If we repeat this process using chars other than "a" we can find out what is the value of the first char in the e-mail address that we want to read. Then, the process can be repeated by appending more chars to the string in order to fully read the user's personal e-mail address. Ultimately, this process can be automated by building a script that reads the whole field by performing a https://en.wikipedia.org/wiki/Binary_search_algorithm[binary search].
+
+## Additional layer of protection
+
+It turns out that I was unable to read any sensitive data from SIGARRA's database by using this method. In fact, many of my queries would result in a special access denied error:
+
+.Error being thrown for some of my queries (translated and adapted)
+image::https://user-images.githubusercontent.com/3010353/44003231-35eaee58-9e47-11e8-9744-80b3b7546942.png[Error being thrown for some of my queries]
+
+I believe this was caused by a second layer of protection in SIGARRA's system, a https://en.wikipedia.org/wiki/Web_application_firewall[Web Application Firewall] (WAF) that was blocking many of my queries. In fact, a simple query such as the one above mentioned would fail, because the `WHERE` clause is blocked by the firewall. Therefore, I needed to change my query to something that did not include specific terms, similarly to https://gustavosilva.me/blog/2017/07/11/How-I-hacked-the-international-application-form-of-the-Barcelona-School-of-Informatics.html[what I described in a previous post].
+
+The main challenge for me to read a particular value from the database was to ensure that the subquery (inside the CASE statement) returned a single-row and single-column value, so that a comparison operator (such as `>`) could be applied to it. To build such query, I had to:
+
+- Bypass the WAF
+- Understand the structure of the database, in terms of table names and columns
+- Ensure the result contains only one row
+- Ensure the result contains only one column
+
+First, to help circunventing the limitations imposed by the WAF, I built a non-comprehensive list of SQL commands, clauses, pseudocolumns and identifiers that were being blocked:
+
+- avg()
+- count()
+- database_name
+- IN
+- max()
+- min()
+- rownum
+- SELECT CASE
+- sum()
+- table_name
+- UNION
+- WHERE
+
+So, to exploit the vulnerability, I had to build a query that extracted sensitive information without using any blocked word and returning a single row and column.
+
+But first, to understand the structure of a database we can list the entries of the "all_tables" table, which contains information on all the tables in the system. For example, to fetch the name of the first table the following query can be executed:
+
+----
+SELECT table_name FROM all_tables WHERE rownum = 1
+----
+
+The problem with this query is that it does not bypass the WAF due to the use of two blocked words: `table_name` and `WHERE`.
+
+## Filtering results without the WHERE clause
+
+*But how to filter results without using the WHERE clause?* There might be a couple ways. One of them is to take advantage of a feature of Oracle databases called https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries003.htm[Hierarchical Queries]. Although these are aimed to be used with tables that contain hierarchical data, we can exploit these constructs to be able to filter the results based on a condition. Look at these two queries:
+
+----
+SELECT owner FROM all_tables WHERE iot_name = 'CHNF$_CLAUSES'
+----
+
+
+----
+SELECT owner FROM all_tables START WITH iot_name = 'CHNF$_CLAUSES' CONNECT BY 1 = 0
+----
+
+These queries return the same result, with the advantage that the latter is not blocked by the WAF. Feel free to check the documentation on https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries003.htm[Hierarchical Queries] for more information on how they work, but the general idea of the second query is that it traverses the results, considering the initial entries to be the ones that have `iot_name = 'CHNF$_CLAUSES'` and then continuing the traversal to entries that match the condition `1 = 0`. Since this condition is always false, only the root entry is returned.
+
+This allows us to bypass the block on the `WHERE` clause, yet still does not allow for an easy selection of a single row, because the `rownum` pseudocolumn is also blocked by the WAF and cannot be used as a filter. Nevertheless, more complex conditions can be defined to ensure only one entry is returned, following a trial-and-error approach.
+
+## Reading a table name without writing "table_name"
+
+Being able to filter results and limiting them to one row gets us one step closer from exploiting this SQL injection vulnerability. But we still need to find the names of the tables in the database, although the WAF disallows queries containing the word `table_name`. This means that we cannot directly select the column `table_name` from the table `all_tables`.
+
+To avoid this, one might try to select all columns (using the `*` operator) instead of specifying the name of the table we want to fetch. However, this procedure violates one of the aforementioned requirements that forces us to build queries with a single-column output.
+
+What other options are available? One of the features of Oracle databases since version 11g is https://www.oracle.com/technetwork/articles/sql/11g-pivot-097235.html[pivoting and unpivoting]. In particular, pivoting can be used to select from a table excluding some columns, https://stackoverflow.com/a/33220953/1568560[as demonstrated in a stack overflow post]. This means that it might be possible to select all columns from `all_tables` but excluding all columns except `table_name`. This would result in only the `table_name` column being selected. The syntax of a `PIVOT` is something like:
+
+----
+SELECT * FROM
+  table
+PIVOT 
+(
+  aggregate_function(column)
+  FOR column
+  IN ( expr1, expr2, ... expr_n) | subquery
+)
+----
+
+However, although the `PIVOT` clause is accepted by the WAF, the `IN` operator is blocked. Since we need the `IN` operator to match the required syntax for pivoting, *it is not possible to use this method to bypass the WAF* and read the `table_name` column.
+
+## The end
+
+Having failed at bypassing the WAF using the techniques mentioned above (and others), I was preparing to give up on exploiting this vulnerability. Yet, some time later, I decided to give it another shot and see if I could come up with new ideas to circunvent the WAF. To my surprise, this time all of my queries were failing, including the ones that used to work before... It seemed like the issue had been fixed!
+
+Anyway, I emailed the developers behind SIGARRA with details on the vulnerability and they confirmed me that they had seen my intrusion attempts in their logs and quickly solved the issue. Therefore I was unable to exploit the system, but happy to know that my academic data is well secured.
+
+
+
+
+
+

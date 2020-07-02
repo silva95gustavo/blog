@@ -1,0 +1,8 @@
+deploy:
+  provider: pages:git
+  token: $GH_TOKEN
+  edge: true
+  on:
+    branch: master
+
+cache: bundler
