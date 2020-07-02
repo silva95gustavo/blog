@@ -62,6 +62,14 @@
     <li class="posts-labelgroup" id="posts-labelgroup">
       <h1 id="posts-label">posts</h1>
       
+      <div class="search-container">
+        <div class="search-section">
+          <i class="icon-search"></i>
+          <input type="text" name="search" id="searchbar" autocomplete="off" aria-label="search in posts">
+        </div>
+        <div class="search-results" id="search-results" data-placeholder="No Results" style="display: none;"></div>
+      </div>
+      
     </li><li><a class="post-link" href="/blog/2018/10/23/How-I-hacked-Anda-the-public-transportation-app-of-Porto-CVE-2018-13342.html">
           <h2 class="post-title">How I hacked Anda, the public transportation app of Porto (CVE-2018-13342)</h2>
         </a>
@@ -129,6 +137,9 @@
     gtag('js', new Date());
     gtag('config', 'UA-70940481-1');
   </script>
+  <script src="/assets/js/simple-jekyll-search.min.js"></script>
+  <script src="/assets/js/search.js"></script>
+  
 </body>
 
 </html>
