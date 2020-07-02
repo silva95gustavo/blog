@@ -1,0 +1,329 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:300|Raleway:400,700" rel="stylesheet">
+<link rel="stylesheet" href="/blog/assets/css/style.css">
+<title>A failed attempt at hacking SIGARRA, the management system of the University of Porto</title>
+<!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>A failed attempt at hacking SIGARRA, the management system of the University of Porto | Gustavo Silva’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="A failed attempt at hacking SIGARRA, the management system of the University of Porto" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="My personal blog." />
+<meta property="og:description" content="My personal blog." />
+<link rel="canonical" href="//blog/2018/08/12/A-failed-attempt-at-hacking-SIGARRA-the-management-system-of-the-University-of-Porto.html" />
+<meta property="og:url" content="//blog/2018/08/12/A-failed-attempt-at-hacking-SIGARRA-the-management-system-of-the-University-of-Porto.html" />
+<meta property="og:site_name" content="Gustavo Silva’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2018-08-12T00:00:00+00:00" />
+<script type="application/ld+json">
+{"description":"My personal blog.","@type":"BlogPosting","url":"//blog/2018/08/12/A-failed-attempt-at-hacking-SIGARRA-the-management-system-of-the-University-of-Porto.html","headline":"A failed attempt at hacking SIGARRA, the management system of the University of Porto","dateModified":"2018-08-12T00:00:00+00:00","datePublished":"2018-08-12T00:00:00+00:00","mainEntityOfPage":{"@type":"WebPage","@id":"//blog/2018/08/12/A-failed-attempt-at-hacking-SIGARRA-the-management-system-of-the-University-of-Porto.html"},"@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+</head>
+
+<body>
+  <main class="container">
+    <section class="about">
+      <a href="/"><img src="/blog/assets/portfolio.png" alt="Gustavo Silva"></a>
+      <h2 id="title">
+        <a href="/">Gustavo Silva</a>
+      </h2>
+      <p class="tagline">Software Engineer</p>
+      <ul class="social"><a href="https://github.com/silva95gustavo">
+          <li>
+            <i class="icon-github-circled"></i>
+          </li>
+        </a><a href="https://www.linkedin.com/in/silva95gustavo">
+          <li>
+            <i class="icon-linkedin-squared"></i>
+          </li>
+        </a><a href="https://twitter.com/silva95gustavo">
+          <li>
+            <i class="icon-twitter-squared"></i>
+          </li>
+        </a></ul><nav class="navigation">
+        <ul>
+          
+          <li>
+            <a href="/">Home</a>
+          </li>
+          
+          <li>
+            <a href="/blog">Blog</a>
+          </li>
+          
+        </ul>
+      </nav><p>&copy;
+        2020</p></section>
+    <section class="content">
+      <div class="post-container">
+  <a class="post-link" href="/blog/2018/08/12/A-failed-attempt-at-hacking-SIGARRA-the-management-system-of-the-University-of-Porto.html">
+    <h2 class="post-title">A failed attempt at hacking SIGARRA, the management system of the University of Porto</h2>
+  </a>
+  <div class="post-meta">
+    <div class="post-date"><i class="icon-calendar"></i>Aug 12, 2018</div></div>
+  <div class="post">
+    <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>SIGARRA is the Information System for the Aggregated Management of Resources and Academic Records of the University of Porto. It serves 30000+ students, as well as professors and other employees.</p>
+</div>
+<div class="paragraph">
+<p>As part of my work on my master&#8217;s thesis, I sometimes consulted similar works from previous students, by accessing the list of previous dissertations of my course, available at <a href="https://sigarra.up.pt/feup/pt/teses.lista_teses?p_curso=742" class="bare">https://sigarra.up.pt/feup/pt/teses.lista_teses?p_curso=742</a>.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://user-images.githubusercontent.com/3010353/44003144-29f40a86-9e46-11e8-8578-fa804c9c875d.png" alt="List of previous dissertations">
+</div>
+<div class="title">Figure 1. List of previous dissertations</div>
+</div>
+<div class="paragraph">
+<p>Each entry on the list contains the title of the document, the name of the student, some relevant dates and the name of the supervisor. On the right side of the page, a sidebar allows the user to filter the entries, change the sorting method, change the number of entries per page or export them to an Excel file. When you chose to change the ordering of the list a couple of parameters are added to the URL, one of them being "p_ord_campo", which translates to "order field parameter" and defines the name of the field that will be considered for sorting. The options in the sidebar allow us to change this field to one of the following values:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>NOME (author&#8217;s name)</p>
+</li>
+<li>
+<p>TITULO (document title)</p>
+</li>
+<li>
+<p>GRAU (type of degree)</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>However, this input field was not properly sanitized, which meant that it was possible to write malicious SQL code instead of those expected values, therefore performing a <a href="https://www.owasp.org/index.php/SQL_Injection">SQL Injection</a> attack.</p>
+</div>
+<div class="paragraph">
+<p><strong>But how did I know that the field was vulnerable and how could it be exploited?</strong> A possible way of defining a query to provide the data displayed on the list of dissertations would be as follows:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SELECT * FROM thesis ORDER BY TITULO ASC</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>If, in the above query, we replace the word <code>TITULO</code> by the name of a different field, the resulting page outputs the same list but sorted in a different manner. If the field is vulnerable and the input is not properly sanitized, it is possible to build a query that sorts the list in different ways depending on the output of a subquery:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SELECT * FROM thesis ORDER BY
+CASE WHEN (
+  SELECT 1 FROM dual
+) &gt; 0
+THEN
+  NOME
+ELSE
+  TITULO
+END</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The subquery <code>SELECT 1 FROM dual</code> always returns a single row with value 1. Since 1 is greater than zero, the list of thesis gets sorted by the field NOME. Likewise, if we change the subquery to return the value 0, the list gets sorted by the field TITULO. Doing this test, it can be concluded that our SQL injected code is indeed being executed and that we have found a method of reading the value of any SQL statement we define, as long as it returns a binary value. Therefore, it should be possible to access sensitive data stored in SIGARRA&#8217;s database, such as a personal e-mail adddress, by filling the "p_ord_campo" field with a string such as:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>CASE WHEN (
+  SELECT personal_email FROM user_accounts WHERE user_code = 'up201304143'
+) &gt; 'a'
+THEN
+  NOME
+ELSE
+  TITULO
+END</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>SIGARRA runs an Oracle Database. In Oracle SQL, the <code>&gt;</code> operator, when used with strings, returns true if the first string comes after the second one alphabetically. With this input, if the first char of the e-mail address of user "up201304143" has a higher value than the value of "a" in the <a href="https://en.wikipedia.org/wiki/ASCII">ASCII table</a>, then the list of thesis gets sorted by the field NOME, otherwise it gets sorted by the field TITULO. If we repeat this process using chars other than "a" we can find out what is the value of the first char in the e-mail address that we want to read. Then, the process can be repeated by appending more chars to the string in order to fully read the user&#8217;s personal e-mail address. Ultimately, this process can be automated by building a script that reads the whole field by performing a <a href="https://en.wikipedia.org/wiki/Binary_search_algorithm">binary search</a>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="additional-layer-of-protection">Additional layer of protection</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>It turns out that I was unable to read any sensitive data from SIGARRA&#8217;s database by using this method. In fact, many of my queries would result in a special access denied error:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://user-images.githubusercontent.com/3010353/44003231-35eaee58-9e47-11e8-9744-80b3b7546942.png" alt="Error being thrown for some of my queries">
+</div>
+<div class="title">Figure 2. Error being thrown for some of my queries (translated and adapted)</div>
+</div>
+<div class="paragraph">
+<p>I believe this was caused by a second layer of protection in SIGARRA&#8217;s system, a <a href="https://en.wikipedia.org/wiki/Web_application_firewall">Web Application Firewall</a> (WAF) that was blocking many of my queries. In fact, a simple query such as the one above mentioned would fail, because the <code>WHERE</code> clause is blocked by the firewall. Therefore, I needed to change my query to something that did not include specific terms, similarly to <a href="https://gustavosilva.me/blog/2017/07/11/How-I-hacked-the-international-application-form-of-the-Barcelona-School-of-Informatics.html">what I described in a previous post</a>.</p>
+</div>
+<div class="paragraph">
+<p>The main challenge for me to read a particular value from the database was to ensure that the subquery (inside the CASE statement) returned a single-row and single-column value, so that a comparison operator (such as <code>&gt;</code>) could be applied to it. To build such query, I had to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Bypass the WAF</p>
+</li>
+<li>
+<p>Understand the structure of the database, in terms of table names and columns</p>
+</li>
+<li>
+<p>Ensure the result contains only one row</p>
+</li>
+<li>
+<p>Ensure the result contains only one column</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>First, to help circunventing the limitations imposed by the WAF, I built a non-comprehensive list of SQL commands, clauses, pseudocolumns and identifiers that were being blocked:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>avg()</p>
+</li>
+<li>
+<p>count()</p>
+</li>
+<li>
+<p>database_name</p>
+</li>
+<li>
+<p>IN</p>
+</li>
+<li>
+<p>max()</p>
+</li>
+<li>
+<p>min()</p>
+</li>
+<li>
+<p>rownum</p>
+</li>
+<li>
+<p>SELECT CASE</p>
+</li>
+<li>
+<p>sum()</p>
+</li>
+<li>
+<p>table_name</p>
+</li>
+<li>
+<p>UNION</p>
+</li>
+<li>
+<p>WHERE</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>So, to exploit the vulnerability, I had to build a query that extracted sensitive information without using any blocked word and returning a single row and column.</p>
+</div>
+<div class="paragraph">
+<p>But first, to understand the structure of a database we can list the entries of the "all_tables" table, which contains information on all the tables in the system. For example, to fetch the name of the first table the following query can be executed:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SELECT table_name FROM all_tables WHERE rownum = 1</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The problem with this query is that it does not bypass the WAF due to the use of two blocked words: <code>table_name</code> and <code>WHERE</code>.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="filtering-results-without-the-where-clause">Filtering results without the WHERE clause</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>But how to filter results without using the WHERE clause?</strong> There might be a couple ways. One of them is to take advantage of a feature of Oracle databases called <a href="https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries003.htm">Hierarchical Queries</a>. Although these are aimed to be used with tables that contain hierarchical data, we can exploit these constructs to be able to filter the results based on a condition. Look at these two queries:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SELECT owner FROM all_tables WHERE iot_name = 'CHNF$_CLAUSES'</pre>
+</div>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SELECT owner FROM all_tables START WITH iot_name = 'CHNF$_CLAUSES' CONNECT BY 1 = 0</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>These queries return the same result, with the advantage that the latter is not blocked by the WAF. Feel free to check the documentation on <a href="https://docs.oracle.com/cd/B19306_01/server.102/b14200/queries003.htm">Hierarchical Queries</a> for more information on how they work, but the general idea of the second query is that it traverses the results, considering the initial entries to be the ones that have <code>iot_name = 'CHNF$_CLAUSES'</code> and then continuing the traversal to entries that match the condition <code>1 = 0</code>. Since this condition is always false, only the root entry is returned.</p>
+</div>
+<div class="paragraph">
+<p>This allows us to bypass the block on the <code>WHERE</code> clause, yet still does not allow for an easy selection of a single row, because the <code>rownum</code> pseudocolumn is also blocked by the WAF and cannot be used as a filter. Nevertheless, more complex conditions can be defined to ensure only one entry is returned, following a trial-and-error approach.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="reading-a-table-name-without-writing-table_name">Reading a table name without writing "table_name"</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Being able to filter results and limiting them to one row gets us one step closer from exploiting this SQL injection vulnerability. But we still need to find the names of the tables in the database, although the WAF disallows queries containing the word <code>table_name</code>. This means that we cannot directly select the column <code>table_name</code> from the table <code>all_tables</code>.</p>
+</div>
+<div class="paragraph">
+<p>To avoid this, one might try to select all columns (using the <code>*</code> operator) instead of specifying the name of the table we want to fetch. However, this procedure violates one of the aforementioned requirements that forces us to build queries with a single-column output.</p>
+</div>
+<div class="paragraph">
+<p>What other options are available? One of the features of Oracle databases since version 11g is <a href="https://www.oracle.com/technetwork/articles/sql/11g-pivot-097235.html">pivoting and unpivoting</a>. In particular, pivoting can be used to select from a table excluding some columns, <a href="https://stackoverflow.com/a/33220953/1568560">as demonstrated in a stack overflow post</a>. This means that it might be possible to select all columns from <code>all_tables</code> but excluding all columns except <code>table_name</code>. This would result in only the <code>table_name</code> column being selected. The syntax of a <code>PIVOT</code> is something like:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>SELECT * FROM
+  table
+PIVOT
+(
+  aggregate_function(column)
+  FOR column
+  IN ( expr1, expr2, ... expr_n) | subquery
+)</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>However, although the <code>PIVOT</code> clause is accepted by the WAF, the <code>IN</code> operator is blocked. Since we need the <code>IN</code> operator to match the required syntax for pivoting, <strong>it is not possible to use this method to bypass the WAF</strong> and read the <code>table_name</code> column.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="the-end">The end</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>Having failed at bypassing the WAF using the techniques mentioned above (and others), I was preparing to give up on exploiting this vulnerability. Yet, some time later, I decided to give it another shot and see if I could come up with new ideas to circunvent the WAF. To my surprise, this time all of my queries were failing, including the ones that used to work before&#8230;&#8203; It seemed like the issue had been fixed!</p>
+</div>
+<div class="paragraph">
+<p>Anyway, I emailed the developers behind SIGARRA with details on the vulnerability and they confirmed me that they had seen my intrusion attempts in their logs and quickly solved the issue. Therefore I was unable to exploit the system, but happy to know that my academic data is well secured.</p>
+</div>
+</div>
+</div>
+  </div><div id="disqus_thread" style="margin-top:25px"></div>
+  <script>
+    var disqus_config = function () {
+      this.page.url = '//blog/2018/08/12/A-failed-attempt-at-hacking-SIGARRA-the-management-system-of-the-University-of-Porto.html';
+      this.page.identifier = '//blog/2018/08/12/A-failed-attempt-at-hacking-SIGARRA-the-management-system-of-the-University-of-Porto.html';
+    };
+    (function () {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://silva95gustavo.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments
+      powered by Disqus.</a></noscript></div>
+
+    </section>
+  </main><script async src="https://www.googletagmanager.com/gtag/js?id=UA-70940481-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'UA-70940481-1');
+  </script>
+</body>
+
+</html>
