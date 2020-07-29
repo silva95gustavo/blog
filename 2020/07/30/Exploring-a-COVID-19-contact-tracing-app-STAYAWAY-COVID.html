@@ -102,7 +102,7 @@ In fact, there are some online decompiler services where you can place the <code
 <div class="paragraph">
 <p>I did not spend much time investigating the app, because the truth is that it is not very complex.
 It serves its purpose well and is not cluttered with unexpected features.
-In addition to examining the source code of the app, I used Frida together with a proxy to listen for network requests and the fact is that it does not seem to perform any call to external servers except to interface with Google Exposure Notification API, to retrieve app configuration data and whenever an user wants to declare himself as having tested positive for COVID-19.</p>
+In addition to examining the source code of the app, I used <a href="https://frida.re/">Frida</a> together with a proxy to listen for network requests and the fact is that it does not seem to perform any call to external servers except to interface with Google Exposure Notification API, to retrieve app configuration data and whenever an user wants to declare himself as having tested positive for COVID-19.</p>
 </div>
 <div class="paragraph">
 <p>However, what did call my attention as a potential security flaw was a particular line of the following <code>BuildConfig.java</code> file:</p>
