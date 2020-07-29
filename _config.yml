@@ -48,6 +48,7 @@ plainwhite:
 plugins:
   - jekyll-asciidoc
   - jekyll-feed
+future: true # Allow posts in the future
 
 # Exclude from processing.
 # The following items will not be processed, by default.
