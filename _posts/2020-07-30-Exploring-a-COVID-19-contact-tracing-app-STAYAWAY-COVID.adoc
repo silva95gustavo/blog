@@ -14,7 +14,7 @@ Once an user is diagnosed with COVID-19, he is able to notify the owners of thos
 someone infected with the virus in the last 14 days.
 
 Note that, despite the fact that different countries may have different implementations of their contract tracing applications,
-the backend API is the same and exposure notifications are shared globally.
+the backend API is the same and exposure notifications are shared globally, at least across most of the adhering European countries.
 
 ## Exploring the Portuguese contact tracing app
 
