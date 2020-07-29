@@ -1,0 +1,197 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:300|Raleway:400,700" rel="stylesheet">
+<link rel="stylesheet" href="/blog/assets/css/style.css">
+<title>Exploring a COVID-19 contact tracing app (STAYAWAY COVID)</title>
+<!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>Exploring a COVID-19 contact tracing app (STAYAWAY COVID) | Gustavo Silva’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="Exploring a COVID-19 contact tracing app (STAYAWAY COVID)" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="My personal blog!" />
+<meta property="og:description" content="My personal blog!" />
+<link rel="canonical" href="https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html" />
+<meta property="og:url" content="https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html" />
+<meta property="og:site_name" content="Gustavo Silva’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2020-07-30T00:00:00+00:00" />
+<script type="application/ld+json">
+{"url":"https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html"},"headline":"Exploring a COVID-19 contact tracing app (STAYAWAY COVID)","dateModified":"2020-07-30T00:00:00+00:00","datePublished":"2020-07-30T00:00:00+00:00","description":"My personal blog!","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+</head>
+
+<body>
+  <main class="container">
+    <section class="about">
+      <a href="/"><img src="/blog/assets/portfolio.png" alt="Gustavo Silva"></a>
+      <h2 id="title">
+        <a href="/">Gustavo Silva</a>
+      </h2>
+      <p class="tagline">Software Engineer</p>
+      <ul class="social"><a href="https://github.com/silva95gustavo">
+          <li>
+            <i class="icon-github-circled"></i>
+          </li>
+        </a><a href="https://www.linkedin.com/in/silva95gustavo">
+          <li>
+            <i class="icon-linkedin-squared"></i>
+          </li>
+        </a><a href="https://twitter.com/silva95gustavo">
+          <li>
+            <i class="icon-twitter-squared"></i>
+          </li>
+        </a></ul><nav class="navigation">
+        <ul>
+          
+          <li>
+            <a href="/">My Website</a>
+          </li>
+          
+          <li>
+            <a href="/blog">Blog</a>
+          </li>
+          
+        </ul>
+      </nav><p>&copy;
+        2020</p></section>
+    <section class="content">
+      <div class="post-container">
+  <a class="post-link" href="/blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html">
+    <h2 class="post-title">Exploring a COVID-19 contact tracing app (STAYAWAY COVID)</h2>
+  </a>
+  <div class="post-meta">
+    <div class="post-date"><i class="icon-calendar"></i>Jul 30, 2020</div></div>
+  <div class="post">
+    <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>To help fight COVID-19, some countries invested in the creation of mobile apps to help detecting transmission of the virus.
+These apps are based on <a href="https://github.com/DP-3T/documents">D3-PT</a>,
+a system implemented by Google and Apple in a joint effort which was made available on most Android and iOS phones via a software update.</p>
+</div>
+<div class="paragraph">
+<p>Such contact tracing apps work by indicating their presence to all nearby (participating) devices via Bluetooth and sharing anonymous codes.
+Once an user is diagnosed with COVID-19, he is able to notify the owners of those devices that they have been physically close to
+someone infected with the virus in the last 14 days.</p>
+</div>
+<div class="paragraph">
+<p>Note that, despite the fact that different countries may have different implementations of their contract tracing applications,
+the backend API is the same and exposure notifications are shared globally.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="exploring-the-portuguese-contact-tracing-app">Exploring the Portuguese contact tracing app</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><a href="https://stayaway.inesctec.pt/en/">STAYAWAY COVID</a> is the name of the Portuguese app for contact tracing.</p>
+</div>
+<div class="paragraph">
+<p>I was curious about exploring the inner workings of the app, so I applied for becoming a beta tester
+in order to have access to it before its launch.</p>
+</div>
+<div class="paragraph">
+<p>Access was quickly granted and, after installing and getting to know the application, I decided to decompile its binary
+and take a look at its code. It is generally fairly easy to decompile an Android application package (<code>.apk</code>).
+In fact, there are some online decompiler services where you can place the <code>.apk</code> file and download a <code>.zip</code> with the decompiled source code.</p>
+</div>
+<div class="paragraph">
+<p>I did not spend much time investigating the app, because the truth is that it is not very complex.
+It serves its purpose well and is not cluttered with unexpected features.
+In addition to examining the source code of the app, I used Frida together with a proxy to listen for network requests and the fact is that it does not seem to perform any call to external servers except to interface with Google Exposure Notification API, to retrieve app configuration data and whenever an user wants to declare himself as having tested positive for COVID-19.</p>
+</div>
+<div class="paragraph">
+<p>However, what did call my attention as a potential security flaw was a particular line of the following <code>BuildConfig.java</code> file:</p>
+</div>
+<div class="listingblock">
+<div class="content">
+<pre>package fct.inesctec.stayaway;
+
+public final class BuildConfig {
+    public static final String APPLICATION_ID = "fct.inesctec.stayaway";
+    public static final String APP_ID = "fct.inesctec.stayaway";
+    public static final String APP_SPECTOR_ANDROID = "android_suppressedABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public static final String APP_SPECTOR_IOS = "ios_suppressedABCDEFGHIJKLMNOPQRSTUVWXYZ";
+    public static final String BACKEND_BUCKET_URL = "https://stayaway.incm.pt/";
+    public static final String BACKEND_CONFIG_URL = "https://stayaway.incm.pt/";
+    public static final String BACKEND_PUBLIC_KEY = "LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFQi8rQ3k2QVlxYmZpbERCc3phb3l4WDZHSkZZNQpEY1MvbVU0LzV1Q0FKb1RYbC9kR3FGd1dUV2syR1RIQ2hBYUNweVpBdFo3QjI0YUxHZFRkSkQ5YTdBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==";
+    public static final String BACKEND_REPORT_URL = "https://stayaway.min-saude.pt/";
+    public static final long BUILD_TIME = 1595158050161L;
+    public static final String BUILD_TYPE = "release";
+    public static final boolean DEBUG = false;
+    public static final String DEV_HISTORY = "FALSE";
+    public static final String FIREBASE_APP_ID_ANDROID = "1:91383277555:android:f1eeafc72de4f4a3f51486";
+    public static final String FIREBASE_APP_ID_IOS = "1:91383277555:ios:c59e8c2306b25dbbf51486";
+    public static final String FIREBASE_CLI_TOKEN = "1//lJlHfZI4IACqj7WykMQ0SMJDbniC-PJ2brG3O2Z5tqo3bs-LjkX_gd6mxYvQEyQSvMy03isS2AKCJ56PI8xcaZXnrQlL9sySHs77";
+    public static final String FLAVOR = "production";
+    public static final String GIT_REPO = "git@gitlab.com:divoc-group/certificates.git";
+    public static final String IOS_APPLE_ID = "surppressed@example.com";
+    public static final String IOS_TEAM_ID = "H4F6Z9HC74";
+    public static final String IOS_TEAM_NAME = "Suppressed Name";
+    public static final String IS_RELEASE = "TRUE";
+    public static final String IS_UI = "FALSE";
+    public static final String NAME = "production_release";
+    public static final int VERSION_CODE = 61;
+    public static final String VERSION_NAME = "0.2.2";
+}</pre>
+</div>
+</div>
+<div class="paragraph">
+<p>The file <code>BuildConfig.java</code> holds a class automatically generated by the <a href="https://gradle.org/">Gradle</a> build tool so that the app code can inspect information about the build.</p>
+</div>
+<div class="paragraph">
+<p>One of the variables defined in this file is called <code>FIREBASE_CLI_TOKEN</code>, meaning that it holds an access token to Firebase services.
+This token can be used with the <a href="https://firebase.google.com/docs/cli">Firebase Command Line Interface (CLI)</a> Tools to test, manage and deploy a Firebase project from the command line. This includes being able to:
+- Deploy code an assets to Firebase projects
+- Interact with data in a Firebase database
+- Import/Export users into/from Firebase</p>
+</div>
+<div class="paragraph">
+<p>At first sight this seemed dangerous. This particular token provided access to some Firebase projects from Keyruptive (one of the companies responsible for developing STAYAWAY COVID) as well as to a Firebase project named STAYAWAY COVID.
+Could it be that this token allowed a malicious user to access and alter the backend services that support this application?
+For example, changing the app configuration for all users and setting a very low alerting threshold,
+so that everyone thinks they are likely to be infected and therefore causing a massive spike in requests for COVID-19 testing?</p>
+</div>
+<div class="paragraph">
+<p>No, that was not the case. Having established contact with the app developers about this issue I was informed that <strong>Firebase was not being used in any backend component</strong>. It was only used to help distributing test versions of the app rathen than as a data repository.
+Nevertheless, having a Firebase access token exposed to the public is still a security flaw which could allow access to read or alter potentially sensitive data in any of the 5 Firebase projects it gave access to.</p>
+</div>
+<div class="paragraph">
+<p>The issue was promptly resolved the day after my report. The token was invalidated and new tokens are no longer being mistakenly bundled in the Android Application Package file.</p>
+</div>
+<div class="paragraph">
+<p>I find it important to have multiple pairs of eyes reviewing software, especially in the case of contact tracing apps where its success depends on having a large userbase and where privacy concerns are a big topic. In my investigation, the security issue I found did not have any impact on the STAYAWAY COVID app itself, however different code reviewers may always find other concerns. On very positive news, <a href="https://github.com/stayawayinesctec">the source code of the application is now available</a>, so security researchers or generally curious people can freely analyze it.</p>
+</div>
+</div>
+</div>
+  </div><div id="disqus_thread" style="margin-top:25px"></div>
+  <script>
+    var disqus_config = function () {
+      this.page.url = 'https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html';
+      this.page.identifier = 'https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html';
+    };
+    (function () {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://silva95gustavo.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments
+      powered by Disqus.</a></noscript></div>
+
+    </section>
+  </main><script async src="https://www.googletagmanager.com/gtag/js?id=UA-70940481-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'UA-70940481-1');
+  </script>
+</body>
+
+</html>

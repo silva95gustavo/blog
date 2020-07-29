@@ -1,4 +1,105 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://gustavosilva.me//blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://gustavosilva.me//blog/" rel="alternate" type="text/html" /><updated>2020-07-29T22:13:57+00:00</updated><id>https://gustavosilva.me//blog/feed.xml</id><title type="html">Gustavo Silva’s Blog</title><subtitle>My personal blog!</subtitle><entry><title type="html">How I hacked Anda, the public transportation app of Porto (CVE-2018-13342)</title><link href="https://gustavosilva.me//blog/2018/10/23/How-I-hacked-Anda-the-public-transportation-app-of-Porto-CVE-2018-13342.html" rel="alternate" type="text/html" title="How I hacked Anda, the public transportation app of Porto (CVE-2018-13342)" /><published>2018-10-23T00:00:00+00:00</published><updated>2018-10-23T00:00:00+00:00</updated><id>https://gustavosilva.me//blog/2018/10/23/How-I-hacked-Anda-the-public-transportation-app-of-Porto-CVE-2018-13342</id><content type="html" xml:base="https://gustavosilva.me//blog/2018/10/23/How-I-hacked-Anda-the-public-transportation-app-of-Porto-CVE-2018-13342.html">&lt;div id=&quot;preamble&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://gustavosilva.me//blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://gustavosilva.me//blog/" rel="alternate" type="text/html" /><updated>2020-07-29T22:21:58+00:00</updated><id>https://gustavosilva.me//blog/feed.xml</id><title type="html">Gustavo Silva’s Blog</title><subtitle>My personal blog!</subtitle><entry><title type="html">Exploring a COVID-19 contact tracing app (STAYAWAY COVID)</title><link href="https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html" rel="alternate" type="text/html" title="Exploring a COVID-19 contact tracing app (STAYAWAY COVID)" /><published>2020-07-30T00:00:00+00:00</published><updated>2020-07-30T00:00:00+00:00</updated><id>https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID</id><content type="html" xml:base="https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html">&lt;div id=&quot;preamble&quot;&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;To help fight COVID-19, some countries invested in the creation of mobile apps to help detecting transmission of the virus.
+These apps are based on &lt;a href=&quot;https://github.com/DP-3T/documents&quot;&gt;D3-PT&lt;/a&gt;,
+a system implemented by Google and Apple in a joint effort which was made available on most Android and iOS phones via a software update.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Such contact tracing apps work by indicating their presence to all nearby (participating) devices via Bluetooth and sharing anonymous codes.
+Once an user is diagnosed with COVID-19, he is able to notify the owners of those devices that they have been physically close to
+someone infected with the virus in the last 14 days.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Note that, despite the fact that different countries may have different implementations of their contract tracing applications,
+the backend API is the same and exposure notifications are shared globally.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;sect1&quot;&gt;
+&lt;h2 id=&quot;exploring-the-portuguese-contact-tracing-app&quot;&gt;Exploring the Portuguese contact tracing app&lt;/h2&gt;
+&lt;div class=&quot;sectionbody&quot;&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;&lt;a href=&quot;https://stayaway.inesctec.pt/en/&quot;&gt;STAYAWAY COVID&lt;/a&gt; is the name of the Portuguese app for contact tracing.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I was curious about exploring the inner workings of the app, so I applied for becoming a beta tester
+in order to have access to it before its launch.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;Access was quickly granted and, after installing and getting to know the application, I decided to decompile its binary
+and take a look at its code. It is generally fairly easy to decompile an Android application package (&lt;code&gt;.apk&lt;/code&gt;).
+In fact, there are some online decompiler services where you can place the &lt;code&gt;.apk&lt;/code&gt; file and download a &lt;code&gt;.zip&lt;/code&gt; with the decompiled source code.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I did not spend much time investigating the app, because the truth is that it is not very complex.
+It serves its purpose well and is not cluttered with unexpected features.
+In addition to examining the source code of the app, I used Frida together with a proxy to listen for network requests and the fact is that it does not seem to perform any call to external servers except to interface with Google Exposure Notification API, to retrieve app configuration data and whenever an user wants to declare himself as having tested positive for COVID-19.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;However, what did call my attention as a potential security flaw was a particular line of the following &lt;code&gt;BuildConfig.java&lt;/code&gt; file:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;listingblock&quot;&gt;
+&lt;div class=&quot;content&quot;&gt;
+&lt;pre&gt;package fct.inesctec.stayaway;
+
+public final class BuildConfig {
+    public static final String APPLICATION_ID = &quot;fct.inesctec.stayaway&quot;;
+    public static final String APP_ID = &quot;fct.inesctec.stayaway&quot;;
+    public static final String APP_SPECTOR_ANDROID = &quot;android_suppressedABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;;
+    public static final String APP_SPECTOR_IOS = &quot;ios_suppressedABCDEFGHIJKLMNOPQRSTUVWXYZ&quot;;
+    public static final String BACKEND_BUCKET_URL = &quot;https://stayaway.incm.pt/&quot;;
+    public static final String BACKEND_CONFIG_URL = &quot;https://stayaway.incm.pt/&quot;;
+    public static final String BACKEND_PUBLIC_KEY = &quot;LS0tLS1CRUdJTiBQVUJMSUMgS0VZLS0tLS0KTUZrd0V3WUhLb1pJemowQ0FRWUlLb1pJemowREFRY0RRZ0FFQi8rQ3k2QVlxYmZpbERCc3phb3l4WDZHSkZZNQpEY1MvbVU0LzV1Q0FKb1RYbC9kR3FGd1dUV2syR1RIQ2hBYUNweVpBdFo3QjI0YUxHZFRkSkQ5YTdBPT0KLS0tLS1FTkQgUFVCTElDIEtFWS0tLS0tCg==&quot;;
+    public static final String BACKEND_REPORT_URL = &quot;https://stayaway.min-saude.pt/&quot;;
+    public static final long BUILD_TIME = 1595158050161L;
+    public static final String BUILD_TYPE = &quot;release&quot;;
+    public static final boolean DEBUG = false;
+    public static final String DEV_HISTORY = &quot;FALSE&quot;;
+    public static final String FIREBASE_APP_ID_ANDROID = &quot;1:91383277555:android:f1eeafc72de4f4a3f51486&quot;;
+    public static final String FIREBASE_APP_ID_IOS = &quot;1:91383277555:ios:c59e8c2306b25dbbf51486&quot;;
+    public static final String FIREBASE_CLI_TOKEN = &quot;1//lJlHfZI4IACqj7WykMQ0SMJDbniC-PJ2brG3O2Z5tqo3bs-LjkX_gd6mxYvQEyQSvMy03isS2AKCJ56PI8xcaZXnrQlL9sySHs77&quot;;
+    public static final String FLAVOR = &quot;production&quot;;
+    public static final String GIT_REPO = &quot;git@gitlab.com:divoc-group/certificates.git&quot;;
+    public static final String IOS_APPLE_ID = &quot;surppressed@example.com&quot;;
+    public static final String IOS_TEAM_ID = &quot;H4F6Z9HC74&quot;;
+    public static final String IOS_TEAM_NAME = &quot;Suppressed Name&quot;;
+    public static final String IS_RELEASE = &quot;TRUE&quot;;
+    public static final String IS_UI = &quot;FALSE&quot;;
+    public static final String NAME = &quot;production_release&quot;;
+    public static final int VERSION_CODE = 61;
+    public static final String VERSION_NAME = &quot;0.2.2&quot;;
+}&lt;/pre&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The file &lt;code&gt;BuildConfig.java&lt;/code&gt; holds a class automatically generated by the &lt;a href=&quot;https://gradle.org/&quot;&gt;Gradle&lt;/a&gt; build tool so that the app code can inspect information about the build.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;One of the variables defined in this file is called &lt;code&gt;FIREBASE_CLI_TOKEN&lt;/code&gt;, meaning that it holds an access token to Firebase services.
+This token can be used with the &lt;a href=&quot;https://firebase.google.com/docs/cli&quot;&gt;Firebase Command Line Interface (CLI)&lt;/a&gt; Tools to test, manage and deploy a Firebase project from the command line. This includes being able to:
+- Deploy code an assets to Firebase projects
+- Interact with data in a Firebase database
+- Import/Export users into/from Firebase&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;At first sight this seemed dangerous. This particular token provided access to some Firebase projects from Keyruptive (one of the companies responsible for developing STAYAWAY COVID) as well as to a Firebase project named STAYAWAY COVID.
+Could it be that this token allowed a malicious user to access and alter the backend services that support this application?
+For example, changing the app configuration for all users and setting a very low alerting threshold,
+so that everyone thinks they are likely to be infected and therefore causing a massive spike in requests for COVID-19 testing?&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;No, that was not the case. Having established contact with the app developers about this issue I was informed that &lt;strong&gt;Firebase was not being used in any backend component&lt;/strong&gt;. It was only used to help distributing test versions of the app rathen than as a data repository.
+Nevertheless, having a Firebase access token exposed to the public is still a security flaw which could allow access to read or alter potentially sensitive data in any of the 5 Firebase projects it gave access to.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;The issue was promptly resolved the day after my report. The token was invalidated and new tokens are no longer being mistakenly bundled in the Android Application Package file.&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;paragraph&quot;&gt;
+&lt;p&gt;I find it important to have multiple pairs of eyes reviewing software, especially in the case of contact tracing apps where its success depends on having a large userbase and where privacy concerns are a big topic. In my investigation, the security issue I found did not have any impact on the STAYAWAY COVID app itself, however different code reviewers may always find other concerns. On very positive news, &lt;a href=&quot;https://github.com/stayawayinesctec&quot;&gt;the source code of the application is now available&lt;/a&gt;, so security researchers or generally curious people can freely analyze it.&lt;/p&gt;
+&lt;/div&gt;
+&lt;/div&gt;
+&lt;/div&gt;</content><author><name></name></author><category term="Hack" /><category term="Exposure" /><category term="STAYAWAY_COVID" /><category term="COVID-19" /><category term="Firebase" /></entry><entry><title type="html">How I hacked Anda, the public transportation app of Porto (CVE-2018-13342)</title><link href="https://gustavosilva.me//blog/2018/10/23/How-I-hacked-Anda-the-public-transportation-app-of-Porto-CVE-2018-13342.html" rel="alternate" type="text/html" title="How I hacked Anda, the public transportation app of Porto (CVE-2018-13342)" /><published>2018-10-23T00:00:00+00:00</published><updated>2018-10-23T00:00:00+00:00</updated><id>https://gustavosilva.me//blog/2018/10/23/How-I-hacked-Anda-the-public-transportation-app-of-Porto-CVE-2018-13342</id><content type="html" xml:base="https://gustavosilva.me//blog/2018/10/23/How-I-hacked-Anda-the-public-transportation-app-of-Porto-CVE-2018-13342.html">&lt;div id=&quot;preamble&quot;&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Andante is the multimodal transport ticket used in the city of Porto. On the 28th July 2018, the company behind Andante released the Anda app to allow the users of their public transport system to no longer need a physical card as ticket. Instead, by taking advantage of the GPS, NFC and BLE capabilities of modern smartphones, passengers now only need their mobile phones to travel.&lt;/p&gt;
