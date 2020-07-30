@@ -1,4 +1,4 @@
-<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://gustavosilva.me//blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://gustavosilva.me//blog/" rel="alternate" type="text/html" /><updated>2020-07-29T22:27:05+00:00</updated><id>https://gustavosilva.me//blog/feed.xml</id><title type="html">Gustavo Silva’s Blog</title><subtitle>My personal blog!</subtitle><entry><title type="html">Exploring a COVID-19 contact tracing app (STAYAWAY COVID)</title><link href="https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html" rel="alternate" type="text/html" title="Exploring a COVID-19 contact tracing app (STAYAWAY COVID)" /><published>2020-07-30T00:00:00+00:00</published><updated>2020-07-30T00:00:00+00:00</updated><id>https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID</id><content type="html" xml:base="https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html">&lt;div id=&quot;preamble&quot;&gt;
+<?xml version="1.0" encoding="utf-8"?><feed xmlns="http://www.w3.org/2005/Atom" ><generator uri="https://jekyllrb.com/" version="4.1.1">Jekyll</generator><link href="https://gustavosilva.me//blog/feed.xml" rel="self" type="application/atom+xml" /><link href="https://gustavosilva.me//blog/" rel="alternate" type="text/html" /><updated>2020-07-30T00:34:54+00:00</updated><id>https://gustavosilva.me//blog/feed.xml</id><title type="html">Gustavo Silva’s Blog</title><subtitle>My personal blog!</subtitle><entry><title type="html">Exploring a COVID-19 contact tracing app (STAYAWAY COVID)</title><link href="https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html" rel="alternate" type="text/html" title="Exploring a COVID-19 contact tracing app (STAYAWAY COVID)" /><published>2020-07-30T00:00:00+00:00</published><updated>2020-07-30T00:00:00+00:00</updated><id>https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID</id><content type="html" xml:base="https://gustavosilva.me//blog/2020/07/30/Exploring-a-COVID-19-contact-tracing-app-STAYAWAY-COVID.html">&lt;div id=&quot;preamble&quot;&gt;
 &lt;div class=&quot;sectionbody&quot;&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;To help fight COVID-19, some countries invested in the creation of mobile apps to help detecting transmission of the virus.
@@ -12,7 +12,7 @@ someone infected with the virus in the last 14 days.&lt;/p&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;Note that, despite the fact that different countries may have different implementations of their contract tracing applications,
-the backend API is the same and exposure notifications are shared globally.&lt;/p&gt;
+the backend API is the same and exposure notifications are shared globally, at least across most of the adhering European countries.&lt;/p&gt;
 &lt;/div&gt;
 &lt;/div&gt;
 &lt;/div&gt;
@@ -77,10 +77,20 @@ public final class BuildConfig {
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;One of the variables defined in this file is called &lt;code&gt;FIREBASE_CLI_TOKEN&lt;/code&gt;, meaning that it holds an access token to Firebase services.
-This token can be used with the &lt;a href=&quot;https://firebase.google.com/docs/cli&quot;&gt;Firebase Command Line Interface (CLI)&lt;/a&gt; Tools to test, manage and deploy a Firebase project from the command line. This includes being able to:
-- Deploy code an assets to Firebase projects
-- Interact with data in a Firebase database
-- Import/Export users into/from Firebase&lt;/p&gt;
+This token can be used with the &lt;a href=&quot;https://firebase.google.com/docs/cli&quot;&gt;Firebase Command Line Interface (CLI)&lt;/a&gt; Tools to test, manage and deploy a Firebase project from the command line. This includes being able to:&lt;/p&gt;
+&lt;/div&gt;
+&lt;div class=&quot;ulist&quot;&gt;
+&lt;ul&gt;
+&lt;li&gt;
+&lt;p&gt;Deploy code an assets to Firebase projects&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Interact with data in a Firebase database&lt;/p&gt;
+&lt;/li&gt;
+&lt;li&gt;
+&lt;p&gt;Import/Export users into/from Firebase&lt;/p&gt;
+&lt;/li&gt;
+&lt;/ul&gt;
 &lt;/div&gt;
 &lt;div class=&quot;paragraph&quot;&gt;
 &lt;p&gt;At first sight this seemed dangerous. This particular token provided access to some Firebase projects from Keyruptive (one of the companies responsible for developing STAYAWAY COVID) as well as to a Firebase project named STAYAWAY COVID.

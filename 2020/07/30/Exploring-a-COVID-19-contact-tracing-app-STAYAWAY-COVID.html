@@ -80,7 +80,7 @@ someone infected with the virus in the last 14 days.</p>
 </div>
 <div class="paragraph">
 <p>Note that, despite the fact that different countries may have different implementations of their contract tracing applications,
-the backend API is the same and exposure notifications are shared globally.</p>
+the backend API is the same and exposure notifications are shared globally, at least across most of the adhering European countries.</p>
 </div>
 </div>
 </div>
@@ -145,10 +145,20 @@ public final class BuildConfig {
 </div>
 <div class="paragraph">
 <p>One of the variables defined in this file is called <code>FIREBASE_CLI_TOKEN</code>, meaning that it holds an access token to Firebase services.
-This token can be used with the <a href="https://firebase.google.com/docs/cli">Firebase Command Line Interface (CLI)</a> Tools to test, manage and deploy a Firebase project from the command line. This includes being able to:
-- Deploy code an assets to Firebase projects
-- Interact with data in a Firebase database
-- Import/Export users into/from Firebase</p>
+This token can be used with the <a href="https://firebase.google.com/docs/cli">Firebase Command Line Interface (CLI)</a> Tools to test, manage and deploy a Firebase project from the command line. This includes being able to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>Deploy code an assets to Firebase projects</p>
+</li>
+<li>
+<p>Interact with data in a Firebase database</p>
+</li>
+<li>
+<p>Import/Export users into/from Firebase</p>
+</li>
+</ul>
 </div>
 <div class="paragraph">
 <p>At first sight this seemed dangerous. This particular token provided access to some Firebase projects from Keyruptive (one of the companies responsible for developing STAYAWAY COVID) as well as to a Firebase project named STAYAWAY COVID.
