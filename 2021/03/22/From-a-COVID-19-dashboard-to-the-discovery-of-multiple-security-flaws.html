@@ -1,0 +1,289 @@
+<!DOCTYPE html>
+<html lang="en">
+
+<head><meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<meta http-equiv="X-UA-Compatible" content="ie=edge">
+<link href="https://fonts.googleapis.com/css?family=Merriweather:300|Raleway:400,700" rel="stylesheet">
+<link rel="stylesheet" href="/blog/assets/css/style.css">
+<title>From a COVID-19 dashboard to the discovery of multiple security flaws</title>
+<!-- Begin Jekyll SEO tag v2.6.1 -->
+<title>From a COVID-19 dashboard to the discovery of multiple security flaws | Gustavo Silva’s Blog</title>
+<meta name="generator" content="Jekyll v4.1.1" />
+<meta property="og:title" content="From a COVID-19 dashboard to the discovery of multiple security flaws" />
+<meta property="og:locale" content="en_US" />
+<meta name="description" content="My personal blog!" />
+<meta property="og:description" content="My personal blog!" />
+<link rel="canonical" href="https://gustavosilva.me//blog/2021/03/22/From-a-COVID-19-dashboard-to-the-discovery-of-multiple-security-flaws.html" />
+<meta property="og:url" content="https://gustavosilva.me//blog/2021/03/22/From-a-COVID-19-dashboard-to-the-discovery-of-multiple-security-flaws.html" />
+<meta property="og:site_name" content="Gustavo Silva’s Blog" />
+<meta property="og:type" content="article" />
+<meta property="article:published_time" content="2021-03-22T00:00:00+00:00" />
+<script type="application/ld+json">
+{"url":"https://gustavosilva.me//blog/2021/03/22/From-a-COVID-19-dashboard-to-the-discovery-of-multiple-security-flaws.html","@type":"BlogPosting","mainEntityOfPage":{"@type":"WebPage","@id":"https://gustavosilva.me//blog/2021/03/22/From-a-COVID-19-dashboard-to-the-discovery-of-multiple-security-flaws.html"},"headline":"From a COVID-19 dashboard to the discovery of multiple security flaws","dateModified":"2021-03-22T00:00:00+00:00","datePublished":"2021-03-22T00:00:00+00:00","description":"My personal blog!","@context":"https://schema.org"}</script>
+<!-- End Jekyll SEO tag -->
+</head>
+
+<body>
+  <main class="container">
+    <section class="about">
+      <a href="/"><img src="/blog/assets/portfolio.png" alt="Gustavo Silva"></a>
+      <h2 id="title">
+        <a href="/">Gustavo Silva</a>
+      </h2>
+      <p class="tagline">Software Engineer</p>
+      <ul class="social"><a href="https://github.com/silva95gustavo">
+          <li>
+            <i class="icon-github-circled"></i>
+          </li>
+        </a><a href="https://www.linkedin.com/in/silva95gustavo">
+          <li>
+            <i class="icon-linkedin-squared"></i>
+          </li>
+        </a><a href="https://twitter.com/silva95gustavo">
+          <li>
+            <i class="icon-twitter-squared"></i>
+          </li>
+        </a></ul><nav class="navigation">
+        <ul>
+          
+          <li>
+            <a href="/">My Website</a>
+          </li>
+          
+          <li>
+            <a href="/blog">Blog</a>
+          </li>
+          
+        </ul>
+      </nav><p>&copy;
+        2021</p></section>
+    <section class="content">
+      <div class="post-container">
+  <a class="post-link" href="/blog/2021/03/22/From-a-COVID-19-dashboard-to-the-discovery-of-multiple-security-flaws.html">
+    <h2 class="post-title">From a COVID-19 dashboard to the discovery of multiple security flaws</h2>
+  </a>
+  <div class="post-meta">
+    <div class="post-date"><i class="icon-calendar"></i>Mar 22, 2021</div></div>
+  <div class="post">
+    <div id="preamble">
+<div class="sectionbody">
+<div class="paragraph">
+<p>COVID-19 surely caught many off guard and one of the implications of that was the need to quickly come up with software solutions that eased decision-making around the virus and also to help citizens staying informed.</p>
+</div>
+<div class="paragraph">
+<p>In Portugal, the government created the COVID-19 Digital Response Office with the goal of evaluating, implementing and providing information on how to best use the digital world to tackle the pandemic. Its members are the government itself, other national entities (including health departments), some IT companies, academic instutions and some associations.</p>
+</div>
+<div class="paragraph">
+<p>One of the outputs of this response office was a set of dashboards combining data on the evolution of virus spread in the population over time. These dashboards were built with <a href="https://www.arcgis.com/">ArcGIS</a>, a geographical information system available since 1999 and created by <a href="https://www.esri.com/">ESRI</a>, a company whose official <a href="https://www.esri-portugal.pt/pt-pt/home">portuguese distributor</a> is a member of the COVID-19 Digital Response Office.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://user-images.githubusercontent.com/3010353/111915083-835ddd80-8a6c-11eb-836f-488cbdfc0cc3.png" alt="COVID-19 info dashboard">
+</div>
+</div>
+<div class="paragraph">
+<p>Those dashboards did call for my curiosity on finding out more about the software and data behind them.
+This article is therefore a compilation of security vulnerabilities, misconfigurations and data exposures that I have encountered and reported to the responsible entities so that they could get addressed.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="1-accidentally-hacking-a-user">1. Accidentally hacking™ a user</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>While searching the ArcGIS documentation pages for reference information on its REST API, I felt the need to go more hands-on and actually play with the API myself. In fact, ArcGIS is licensed for free for personal use, but I was not aware of this fact at the time. Instead, I found some test credentials (something like "test" as username and "test" as password) which I figured could be the credentials for a test development account in ArcGIS.</p>
+</div>
+<div class="paragraph">
+<p>Turns out I was able to successfully log in to the system with those credentials, but my assumption was wrong. <strong>This was not a test account, it was an actually usable account</strong>. And this account had a ton of usage credits available.</p>
+</div>
+<div class="paragraph">
+<p><a href="https://owasp.org/www-project-top-ten/OWASP_Top_Ten_2017/Top_10-2017_A6-Security_Misconfiguration">The exploitation of default credentials is a very common attack vector</a> and of zero complexity in most cases. However, after contacting ESRI about this incident, I was informed that this was not an officially created test account, instead it was created by an actual user of the system, who happened to work at ESRI judging from the <code>@esri.com</code> email address.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="2-leaked-data-due-to-wrong-permissions">2. Leaked data due to wrong permissions</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>The same server that hosted the COVID-19 dashboards also hosted multiple other services including, but not limited to:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>source data for other COVID-19 dashboards</p>
+</li>
+<li>
+<p>feedback forms</p>
+</li>
+<li>
+<p>experiments done to understand the ArcGIS software</p>
+</li>
+<li>
+<p>geographical data</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>I went through the hundreds of services available and discovered that 23 of these services contained sensitive personal data.
+In total, the exposed data contained:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>~2500 personal names</p>
+</li>
+<li>
+<p>~500 personal email addresses</p>
+</li>
+<li>
+<p>~500 personal phone numbers</p>
+</li>
+<li>
+<p>~50 personal street addresses</p>
+</li>
+<li>
+<p>~1000 ID card numbers</p>
+</li>
+<li>
+<p>~150 free-text opinion form responses</p>
+</li>
+<li>
+<p>~150 1-5 rating form responses</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>In addition to this textual data, I found an attachment image containing a screen capture of a video conversation that had happened on the 20th April 2020. The chat messages visible in this screen capture included an URL and two values which appeared to be <strong>a username and a password</strong>.
+The URL pointed to the ArcGIS administration page used by a Portuguese city council, which means that the other two values were very likely the administrator credentials of the ArcGIS service used by this city council.</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://user-images.githubusercontent.com/3010353/111993434-890bff80-8b0e-11eb-9405-4c25702af67b.jpg" alt="Exposed credentials in a video conversation">
+</div>
+</div>
+<div class="paragraph">
+<p>Having contacted both Esri PT and the affected city council, the issues got resolved quickly and therefore the personal data is no longer exposed and the password for the administrator account has been changed.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="3-wrong-permissions-in-a-covid-19-dashboard">3. Wrong permissions in a COVID-19 dashboard</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p>One of the dashboards made available by Esri Portugal displayed a map and list of closed facilities and cancelled/rescheduled events:</p>
+</div>
+<div class="imageblock">
+<div class="content">
+<img src="https://user-images.githubusercontent.com/3010353/111926979-e9675680-8aa6-11eb-87bf-ba6016eab759.png" alt="Affected events and facilities dashboard">
+</div>
+</div>
+<div class="paragraph">
+<p>Looking at the configured permissions of the service behind this dashboard, the following aspects stood out:</p>
+</div>
+<div class="ulist">
+<ul>
+<li>
+<p>It allowed executing the following actions: <strong>Create</strong>, <strong>Delete</strong>, Query, <strong>Update</strong>, <strong>Editing</strong>, Extract, Sync</p>
+</li>
+<li>
+<p>All anonymous users were allowed to execute the actions above</p>
+</li>
+</ul>
+</div>
+<div class="paragraph">
+<p>The data present in this dashboard could therefore be compromised by a malicious user, who could use it for advertising, phishing attempts, links to malicious websites or even the removal of all entries.</p>
+</div>
+<div class="paragraph">
+<p>After I notified the team behind this service, the issue was resolved by properly restricting the permissions of the service so that anonymous users are only allowed to query data and not to change it.</p>
+</div>
+</div>
+</div>
+<div class="sect1">
+<h2 id="4-access-control-vulnerability">4. Access Control vulnerability</h2>
+<div class="sectionbody">
+<div class="paragraph">
+<p><strong>Note:</strong> This last section is very specific to the ArcGIS software. Read it only if you are really interested or really bored 😊.</p>
+</div>
+<div class="paragraph">
+<p>In the ArcGIS software, <strong>replicas</strong> are copies of a database in another location. Replicas can be used to sync data between ArcGIS online and a local client, which is particularly useful to make edits while offline and later synchronize the local edits with the server.</p>
+</div>
+<div class="paragraph">
+<p>The process of working with replicas follows these two steps:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p><strong>Create a replica</strong> on a given Feature Service (a service that hosts a set of data). Here we configure our replica and specify which layers we want to replicate (think of layers as different tables in a database or different sheets in a spreadsheet).</p>
+</li>
+<li>
+<p><strong>Synchronize replica</strong>, which means sending any edits that have been performed offline and receiving other edits that may have been applied by other users.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>As we have seen in a previous section of this post, Feature Services have a configurable set of available actions (e.g. Create, Delete, Query, Update, Editing, Extract and Sync). In specific, the <strong>Query</strong> capability is what allows reading data from a service.</p>
+</div>
+<div class="paragraph">
+<p>While investigating how replicas worked in ArcGIS and looking for potential security issues, I found an incorrect access control vulnerability which <strong>allows remote attackers to read data from a Feature Service which does not have the "Query" capability by synchronizing it against a replica which belongs to a different Feature Service</strong>.</p>
+</div>
+<div class="paragraph">
+<p>These are the steps to reproduce:</p>
+</div>
+<div class="olist arabic">
+<ol class="arabic">
+<li>
+<p>Create Feature Service A with capabilities "Create, Editing, Sync" (<strong>no Query</strong>) and which disallows creating replicas.</p>
+</li>
+<li>
+<p>Try to create a new replica of Feature Service A at <a href="https://&lt;featureservice-A-url&gt;/createReplica" class="bare">https://&lt;featureservice-A-url&gt;/createReplica</a> and verify the operation fails with the error "This operation is not supported.".</p>
+</li>
+<li>
+<p>Create Feature Service B with capabilities "Create, <strong>Query</strong>, Editing, Sync" and which allows creating replicas.</p>
+</li>
+<li>
+<p>Create a new replica of Feature Service B at <a href="https://&lt;featureservice-B-url&gt;/createReplica" class="bare">https://&lt;featureservice-B-url&gt;/createReplica</a>.</p>
+</li>
+<li>
+<p>Use the new replica to synchronize snapshot against Feature Service B at <a href="https://&lt;featureservice-B-url&gt;/synchronizeReplica" class="bare">https://&lt;featureservice-B-url&gt;/synchronizeReplica</a> and verify the operation succeeds as expected.</p>
+</li>
+<li>
+<p>Use the same replica ID of Feature Service B to synchronize snapshot against Feature Service A at <a href="https://&lt;featureservice-A-url&gt;/synchronizeReplica" class="bare">https://&lt;featureservice-A-url&gt;/synchronizeReplica</a> and verify the operation succeeds displaying a snapshot of all data, even though the replica belongs to a different feature service and the "Query" capability is not present.</p>
+</li>
+</ol>
+</div>
+<div class="paragraph">
+<p>In short, <strong>we trick the system by asking to synchronize a service against a replica of a different service</strong> (which shouldn&#8217;t be allowed).</p>
+</div>
+<div class="paragraph">
+<p>Having spoken to the Incident Response Team behing ArcGIS, the issue was acknowledged and a patch was released soon after the report. I thank the team for including me in their <a href="https://trust.arcgis.com/en/security-concern/">list of security researchers</a>.</p>
+</div>
+</div>
+</div>
+  </div><div id="disqus_thread" style="margin-top:25px"></div>
+  <script>
+    var disqus_config = function () {
+      this.page.url = 'https://gustavosilva.me//blog/2021/03/22/From-a-COVID-19-dashboard-to-the-discovery-of-multiple-security-flaws.html';
+      this.page.identifier = 'https://gustavosilva.me//blog/2021/03/22/From-a-COVID-19-dashboard-to-the-discovery-of-multiple-security-flaws.html';
+    };
+    (function () {
+      var d = document, s = d.createElement('script');
+      s.src = 'https://silva95gustavo.disqus.com/embed.js';
+      s.setAttribute('data-timestamp', +new Date());
+      (d.head || d.body).appendChild(s);
+    })();
+  </script>
+  <noscript>Please enable JavaScript to view the <a href="https://disqus.com/?ref_noscript" rel="nofollow">comments
+      powered by Disqus.</a></noscript></div>
+
+    </section>
+  </main><script async src="https://www.googletagmanager.com/gtag/js?id=UA-70940481-1"></script>
+  <script>
+    window.dataLayer = window.dataLayer || [];
+    function gtag() { dataLayer.push(arguments); }
+    gtag('js', new Date());
+    gtag('config', 'UA-70940481-1');
+  </script>
+</body>
+
+</html>
