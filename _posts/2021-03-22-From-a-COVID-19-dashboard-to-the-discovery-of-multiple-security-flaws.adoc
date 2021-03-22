@@ -40,11 +40,11 @@ In total, the exposed data contained:
 * ~150 1-5 rating form responses
 
 In addition to this textual data, I found an attachment image containing a screen capture of a video conversation that had happened on the 20th April 2020. The chat messages visible in this screen capture included an URL and two values which appeared to be *a username and a password*.
-The URL pointed to the ArcGIS administration page used by the city council of Condeixa-a-Nova (Coimbra, Portugal), which means that the other two values were very likely the administrator credentials of the ArcGIS service used by this city council.
+The URL pointed to the ArcGIS administration page used by a Portuguese city council, which means that the other two values were very likely the administrator credentials of the ArcGIS service used by this city council.
 
-image::https://user-images.githubusercontent.com/3010353/111926420-aad09c80-8aa4-11eb-8fa9-5e665fe7c0f9.jpg[Exposed credentials in a Skype conversation]
+image::https://user-images.githubusercontent.com/3010353/111993434-890bff80-8b0e-11eb-9405-4c25702af67b.jpg[Exposed credentials in a video conversation]
 
-Having contacted both Esri PT and Condeixa's city council, the issues got resolved quickly and therefore the personal data is no longer exposed and the password for the administrator account has been changed.
+Having contacted both Esri PT and the affected city council, the issues got resolved quickly and therefore the personal data is no longer exposed and the password for the administrator account has been changed.
 
 ## 3. Wrong permissions in a COVID-19 dashboard
 
