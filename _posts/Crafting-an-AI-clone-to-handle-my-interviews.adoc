@@ -1,0 +1,28 @@
+---
+image: 
+published_at: 2023-09-04
+tags: [AI, GPT, ChatGPT, LLM, Generative AI]
+---
+
+# Crafting an AI clone to handle my interviews
+
+In the ever-evolving landscape of AI and technology, I embarked on a unique journey to create a virtual version of myself – an AI clone capable of engaging in interviews and answering questions just like I would. Welcome to the realm of "Crafting an AI Clone to Handle My Interviews." In this article, I'll delve into the fascinating process of developing an AI-powered clone, outlining the various technologies involved and the seamless integration that brought it all to life.
+
+## Components
+
+### The AI Core: Llama-2 LLM
+
+At the heart of this project lies Llama-2 LLM, an advanced language model designed to understand and generate human-like text responses. With its ability to comprehend context and generate coherent answers, Llama-2 forms the foundation of the AI clone's communication skills.
+
+### Bringing Words to Life: Text-to-Speech Service
+
+To transform the generated text into spoken words, an integration with a text-to-speech service, Amazon Polly, was established. This integration seamlessly converts textual responses into natural-sounding speech, bridging the gap between text-based AI and human-like interaction.
+
+From my own experience (plus publicly available reviews) this is not the best text-to-speech service available and you will get more natrual results with a tool such as ElevenLabs. However, the pricing difference between the two is quite significant so I decided to compromise in favor of lower costs.
+
+### The Visual Element: Wav2Lip and Template Videos
+
+Incorporating a visual element into the AI clone's interactions was made possible through Wav2Lip technology. While the original videos acted as templates, lacking lip movement but featuring head and hand gestures, Wav2Lip breathed life into these videos. The AI-generated speech was synchronized with the video, creating an authentic and immersive experience for the audience.
+
+More than one templates were created and the template chosen in each individual reply is actually picked at random from that pool. This adds some variety to the results.
+
