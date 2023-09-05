@@ -56,15 +56,15 @@ From my own experience (plus publicly available reviews) this is not the best te
 
 Incorporating a visual element into the AI clone's interactions was made possible through Wav2Lip algorithm. Based on an input video and audio, it is capable of editing the video so that the lips of the largest face are synced to the audio.
 
-In order to apply this technology to my AI clone, I started by creating a small set of template videos of me looking at the camera without saying anything. While these videos acted as templates, lacking lip movement but featuring head and hand gestures.
+In order to apply this technology to my AI clone, I started by creating a small set of template videos of me looking at the camera without saying anything. These videos lack lip movement but feature head movement and hand gestures.
 
 .Template video
-video::../assets/ai-clone/template.mp4[height=200]
+video::assets/ai-clone/template.mp4[height=200]
 
 Wav2Lip breathed life into these videos. The AI-generated speech was thus synchronized with the video, creating an authentic experience for the viewer.
 
 .Video synced to speech using Wav2Lip
-video::../assets/ai-clone/wav2lip-example.mp4[height=200]
+video::assets/ai-clone/wav2lip-example.mp4[height=200]
 
 Multiple templates were created and the template chosen in each individual reply is actually picked at random from that pool. This adds some variety to the results.
 
