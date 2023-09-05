@@ -1,0 +1,62 @@
+---
+image: 
+published_at: 2023-09-05
+tags: [AI, GPT, ChatGPT, LLM, Generative AI]
+---
+
+# Crafting an AI clone to handle my interviews
+
+In the ever-evolving landscape of AI and technology, I embarked on a unique journey to create a virtual version of myself – an AI clone capable of engaging in interviews and answering questions just like I would.
+
+## Components
+
+### Answering the prompts with a Large Language Model
+
+As the first step in the AI clone pipeline, we need to read the question of the user and generate an answer for it.
+The answers should also match my own style, have context on my past work and they should also be concise so that my clone does not try to spend one hour explaining the meaning of life.
+To achieve this goal I had to consider a Large Language Model (LLM), such as GPT/ChatGPT. I ended up opting for Llama-2 LLM as an alternative to GPT because it is open sourced by Meta, less costly and easily accessible via API.
+
+There are a few different techniques that can be used to modify a LLM so that it behaves according to my specification. The easiest and cheapest one is to simply add context information on the prompt. In fact, the process is so simple that it required just the following code snippet in order to generate the text with the reply to each question:
+
+```typescript
+import Replicate from 'replicate';
+...
+await replicate.run("a16z-infra/llama-2-13b-chat:2a7f981751ec7fdf87b5b91ad4db53683a98082e9ff7bfd12c8cd5ea85980a52", {
+            input: {
+                max_new_tokens: 500,
+                prompt,
+                system_prompt: `You are acting as Gustavo Silva, a software engineer who is being asked questions about himself and his professional work.
+Here is your resume:
+===
+...
+===
+If a question does not make any sense, or is not factually coherent, explain why instead of answering something not correct. If you don't know the answer to a question, please don't share false information.
+Prefer direct replies, most of the times one sentence is enough.
+Do not include any introductory text, go straight to the answer. Remember to keep your answer short.`,
+                temperature: 0.2,
+            }
+        }
+```
+
+Explaining each parameter:
+
+- `max_new_tokens`: Limiting the maximum number of tokens in the response to avoid generating lengthy videos. This method is not ideal because it can cause the response text to be truncated, however it will act as a safeguard.
+- `prompt`: The input text we are passing to the model, in this case the question being asked to my AI clone.
+- `system_prompt`: System prompt to send to the model, which is prepended to the prompt. Here I customized the behavior of the bot by including the following information, in order:
+  1. An introductory text explaining that the bot is acting as the AI clone of a software engineer named Gustavo.
+  1. A text dump of my resume.
+  3. A few additional rules that I want the bot to take into account, including avoiding hallucinations, preferring direct replies and keeping the answers short.
+- `temperature`: Adjusts randomness of outputs. I have decided to lower it from the default value of `0.75` so that it provides more factual and less creative answers.
+
+### Bringing Words to Life: Text-to-Speech Service
+
+To transform the generated text into spoken words, an integration with a text-to-speech service, Amazon Polly, was established. This integration seamlessly converts textual responses into natural-sounding speech, bridging the gap between text-based AI and human-like interaction.
+
+From my own experience (plus publicly available reviews) this is not the best text-to-speech service available and you will get more natrual results with a tool such as ElevenLabs. However, the pricing difference between the two is quite significant so I decided to compromise in favor of lower costs.
+
+### The Visual Element: Wav2Lip and Template Videos
+
+Incorporating a visual element into the AI clone's interactions was made possible through Wav2Lip technology. While the original videos acted as templates, lacking lip movement but featuring head and hand gestures, Wav2Lip breathed life into these videos. The AI-generated speech was synchronized with the video, creating an authentic and immersive experience for the audience.
+
+More than one templates were created and the template chosen in each individual reply is actually picked at random from that pool. This adds some variety to the results.
+
