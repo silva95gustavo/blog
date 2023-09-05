@@ -8,9 +8,7 @@ tags: [AI, GPT, ChatGPT, LLM, Generative AI]
 
 In the ever-evolving landscape of AI and technology, I embarked on a unique journey to create a virtual version of myself – an AI clone capable of engaging in interviews and answering questions just like I would.
 
-## Components
-
-### Answering the prompts with a Large Language Model
+## Answering the prompts with a Large Language Model
 
 As the first step in the AI clone pipeline, we need to read the question of the user and generate an answer for it.
 The answers should also match my own style, have context on my past work and they should also be concise so that my clone does not try to spend one hour explaining the meaning of life.
@@ -18,7 +16,7 @@ To achieve this goal I had to consider a Large Language Model (LLM), such as GPT
 
 There are a few different techniques that can be used to modify a LLM so that it behaves according to my specification. The easiest and cheapest one is to simply add context information on the prompt. In fact, the process is so simple that it required just the following code snippet in order to generate the text with the reply to each question:
 
-```typescript
+```
 import Replicate from 'replicate';
 ...
 await replicate.run("a16z-infra/llama-2-13b-chat:2a7f981751ec7fdf87b5b91ad4db53683a98082e9ff7bfd12c8cd5ea85980a52", {
@@ -44,19 +42,36 @@ Explaining each parameter:
 - `prompt`: The input text we are passing to the model, in this case the question being asked to my AI clone.
 - `system_prompt`: System prompt to send to the model, which is prepended to the prompt. Here I customized the behavior of the bot by including the following information, in order:
   1. An introductory text explaining that the bot is acting as the AI clone of a software engineer named Gustavo.
-  1. A text dump of my resume.
+  2. A text dump of my resume.
   3. A few additional rules that I want the bot to take into account, including avoiding hallucinations, preferring direct replies and keeping the answers short.
 - `temperature`: Adjusts randomness of outputs. I have decided to lower it from the default value of `0.75` so that it provides more factual and less creative answers.
 
-### Bringing Words to Life: Text-to-Speech Service
+## Bringing Words to Life: Text-to-Speech Service
 
-To transform the generated text into spoken words, an integration with a text-to-speech service, Amazon Polly, was established. This integration seamlessly converts textual responses into natural-sounding speech, bridging the gap between text-based AI and human-like interaction.
+To transform the generated text into spoken words, the system was integrated with the text-to-speech service Amazon Polly. This integration seamlessly converts textual responses into natural-sounding speech, bridging the gap between text-based AI and human-like interaction.
 
 From my own experience (plus publicly available reviews) this is not the best text-to-speech service available and you will get more natrual results with a tool such as ElevenLabs. However, the pricing difference between the two is quite significant so I decided to compromise in favor of lower costs.
 
-### The Visual Element: Wav2Lip and Template Videos
+## The Visual Element: Wav2Lip and Template Videos
 
-Incorporating a visual element into the AI clone's interactions was made possible through Wav2Lip technology. While the original videos acted as templates, lacking lip movement but featuring head and hand gestures, Wav2Lip breathed life into these videos. The AI-generated speech was synchronized with the video, creating an authentic and immersive experience for the audience.
+Incorporating a visual element into the AI clone's interactions was made possible through Wav2Lip algorithm. Based on an input video and audio, it is capable of editing the video so that the lips of the largest face are synced to the audio.
 
-More than one templates were created and the template chosen in each individual reply is actually picked at random from that pool. This adds some variety to the results.
+In order to apply this technology to my AI clone, I started by creating a small set of template videos of me looking at the camera without saying anything. While these videos acted as templates, lacking lip movement but featuring head and hand gestures.
 
+.Template video
+video::../assets/ai-clone/template.mp4[height=200]
+
+Wav2Lip breathed life into these videos. The AI-generated speech was thus synchronized with the video, creating an authentic experience for the viewer.
+
+.Video synced to speech using Wav2Lip
+video::../assets/ai-clone/wav2lip-example.mp4[height=200]
+
+Multiple templates were created and the template chosen in each individual reply is actually picked at random from that pool. This adds some variety to the results.
+
+## Wrapping up
+
+Now that the AI clone was built, all that was left to do was to develop the frontend and deploy the full solution somewhere so it can be accessed by anyone in the web. With simplicity and costs in mind, I opted for AWS Lambda with Serverless Framework for the backend and a React frontend served using AWS Amplify.
+
+Last but not least, and in fact the most time consuming part of the whole process, I implemented some anti-bot and anti-spam measures to ensure that the operational costs don't blow up.
+
+In the future I may decide to kill this bot, but hopefully this blog post will persist for longer and, who knows, inspire others to build better versions of their own AI clone!
