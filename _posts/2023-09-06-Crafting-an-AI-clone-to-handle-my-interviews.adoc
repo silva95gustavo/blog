@@ -58,13 +58,13 @@ Incorporating a visual element into the AI clone's interactions was made possibl
 
 In order to apply this technology to my AI clone, I started by creating a small set of template videos of me looking at the camera without saying anything. These videos lack lip movement but feature head movement and hand gestures.
 
-.Template video
-video::assets/ai-clone/template.mp4[height=200]
+.Template video:
+video::d9u-4gzGZmw[youtube,height=380]
 
 Wav2Lip breathed life into these videos. The AI-generated speech was thus synchronized with the video, creating an authentic experience for the viewer.
 
-.Video synced to speech using Wav2Lip
-video::assets/ai-clone/wav2lip-example.mp4[height=200]
+.Video synced to speech using Wav2Lip:
+video::10uOmih1cqw[youtube,height=380]
 
 Multiple templates were created and the template chosen in each individual reply is actually picked at random from that pool. This adds some variety to the results.
 
@@ -72,6 +72,6 @@ Multiple templates were created and the template chosen in each individual reply
 
 Now that the AI clone was built, all that was left to do was to develop the frontend and deploy the full solution somewhere so it can be accessed by anyone in the web. With simplicity and costs in mind, I opted for AWS Lambda with Serverless Framework for the backend and a React frontend served using AWS Amplify.
 
-Last but not least, and in fact the most time consuming part of the whole process, I implemented some anti-bot and anti-spam measures to ensure that the operational costs don't blow up.
+Last but not least, and in fact the most time consuming part of the whole process, I implemented some anti-bot and anti-spam measures to ensure fair use and that the operational costs don't blow up.
 
 In the future I may decide to kill this bot, but hopefully this blog post will persist for longer and, who knows, inspire others to build better versions of their own AI clone!
