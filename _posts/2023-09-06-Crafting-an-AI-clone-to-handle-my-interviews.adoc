@@ -54,7 +54,7 @@ Explaining each parameter:
 
 To transform the generated text into spoken words, the system was integrated with the text-to-speech service Amazon Polly. This integration seamlessly converts textual responses into natural-sounding speech, bridging the gap between text-based AI and human-like interaction.
 
-From my own experience (plus publicly available reviews) this is not the best text-to-speech service available and you will get more natrual results with a tool such as ElevenLabs. However, the pricing difference between the two is quite significant so I decided to compromise in favor of lower costs.
+From my own experience (plus publicly available reviews) this is not the best text-to-speech service available and you will get more natural results with a tool such as ElevenLabs. However, the pricing difference between the two is quite significant so I decided to compromise in favor of lower costs.
 
 ## The Visual Element: Wav2Lip and Template Videos
 
