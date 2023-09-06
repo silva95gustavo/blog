@@ -8,6 +8,10 @@ tags: [AI, GPT, ChatGPT, LLM, Generative AI]
 
 In the ever-evolving landscape of AI and technology, I embarked on a unique journey to create a virtual version of myself – an AI clone capable of engaging in interviews and answering questions just like I would.
 
+Let's start by having a peek at the end result and then I will explain how it was built.
+
+video::8hZFSt6k8vQ[youtube,height=438]
+
 ## Answering the prompts with a Large Language Model
 
 As the first step in the AI clone pipeline, we need to read the question of the user and generate an answer for it.
