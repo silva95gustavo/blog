@@ -45,6 +45,8 @@ plainwhite:
     - title: Blog
       url: "/blog"
   show_excerpts: true
+  portfolio_image:  "assets/portfolio.png"
+
 plugins:
   - jekyll-asciidoc
   - jekyll-feed
