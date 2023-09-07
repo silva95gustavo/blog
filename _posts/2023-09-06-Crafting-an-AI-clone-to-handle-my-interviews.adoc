@@ -1,5 +1,5 @@
 ---
-image: 
+image: https://user-images.githubusercontent.com/3010353/266407267-2b611304-79d9-4cf1-bad3-3de9d67633bc.png
 published_at: 2023-09-06
 tags: [AI, GPT, ChatGPT, LLM, Generative AI]
 ---
