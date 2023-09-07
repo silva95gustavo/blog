@@ -79,7 +79,7 @@ Could it be that this token allowed a malicious user to access and alter the bac
 For example, changing the app configuration for all users and setting a very low alerting threshold,
 so that everyone thinks they are likely to be infected and therefore causing a massive spike in requests for COVID-19 testing?
 
-No, that was not the case. Having established contact with the app developers about this issue I was informed that *Firebase was not being used in any backend component*. It was only used to help distributing test versions of the app rathen than as a data repository.
+No, that was not the case. Having established contact with the app developers about this issue I was informed that *Firebase was not being used in any backend component*. It was only used to help distributing test versions of the app rather than as a data repository.
 Nevertheless, having a Firebase access token exposed to the public is still a security flaw which could allow access to read or alter potentially sensitive data in any of the 5 Firebase projects it gave access to.
 
 The issue was promptly resolved the day after my report. The token was invalidated and new tokens are no longer being mistakenly bundled in the Android Application Package file.
