@@ -1,0 +1,87 @@
+---
+image: https://github.com/silva95gustavo/blog/assets/3010353/c8ac313c-1cdc-41da-bfa4-0bfc3bb124f4
+published_at: 2023-10-03
+tags: [Flexispot]
+---
+
+# How I hacked FlexiSpot for a free standing desk
+
+FlexiSpot is a popular brand for electric standing desks and ergonomic office furniture. As a security researcher, I decided to take a look at FlexiSpot's website and API out of curiosity.
+
+FlexiSpot has a "Spin the Wheel" game where customers can earn points through activities like sharing FlexiSpot on social media. These points are used to spin a prize wheel for chances to win coupons or products. After digging into the Spin the Wheel feature, I discovered several vulnerabilities that could allow unauthorized access.
+
+image::https://github.com/silva95gustavo/blog/assets/3010353/c8ac313c-1cdc-41da-bfa4-0bfc3bb124f4[FlexiSpot "Spin the Wheel" game]
+
+## The Vulnerabilities
+First, I looked at the `/random/point/customer` endpoint used to retrieve customer reward data. Here is an example of the payload it returned:
+```json
+{
+    "code": 1,
+    "data": [
+        {
+            "entity_id": "6454",
+            "rate_id": "14",
+            "order_id": "0",
+            "user_email": "silva95gustavo@gmail.com",
+            "is_send": "0",
+            "code_value": null,
+            "created_at": "2023-09-01 20:54:29",
+            "updated_at": "2023-09-01 20:54:29",
+            "created_ip": "188.37.216.209",
+            "point_value": "5",
+            "rate_name": "5 Puntos",
+            "rate_title": "5 Puntos",
+            "rate_type": "2",
+            "product": "0"
+        },
+        {
+            "entity_id": "6453",
+            "rate_id": "15",
+            "order_id": "0",
+            "user_email": "silva95gustavo@gmail.com",
+            "is_send": "0",
+            "code_value": "XAX0P1PX2",
+            "created_at": "2023-09-01 20:53:48",
+            "updated_at": "2023-09-01 20:53:48",
+            "created_ip": "188.37.216.209",
+            "point_value": "0",
+            "rate_name": "Cúpon 5€ off ",
+            "rate_title": "Cúpon 5€ off ",
+            "rate_type": "1",
+            "product": "0"
+        }
+    ],
+    "total": 2
+}
+```
+
+One of the request parameters of this endpoint was the customer ID. Turns out that this endpoint did not properly validate access - by simply changing the `customerId` parameter, *I could view email addresses belonging to other customers and prize histories, including coupon codes*.
+
+Investigating further, I also found that I could "spin the wheel" on behalf of other customers using the wheel spinning endpoint. Again, this simply required tampering with the `customerId` parameter to act as a different user.
+
+## Responsible Disclosure
+As an ethical hacker, I do not actually exploit vulnerabilities for personal gain. I decided to responsibly disclose these issues directly to FlexiSpot's security team.
+
+I sent them an email detailing the vulnerabilities I found, and let them know I expected no compensation other than recognition for my work. However, I did cheekily mention that I wouldn't say no to one of their slick ED5 standing desks as a token of appreciation!
+
+FlexiSpot's team confirmed receipt of my disclosure and said they would investigate and address these issues. I'm glad I could help them improve their customer rewards program security.
+
+To my surprise, a few days later I received an email from FlexiSpot customer support saying they were shipping me the standing desk as thanks for helping improve their security!
+
+And I must say - this desk is sleek and stable! So let's finish this article with a short review of this standing desk.
+
+## Standing desk review (FlexiSpot ED5)
+
+Pros:
+- Whisper-quiet motors.
+- The height adjustment lets me alternate seamlessly between sitting and standing throughout the day.
+- I had read online that mounting this standing desk could be tricky but the process was well explained and I did not find it difficult - if you are used to mounting IKEA furniture then I'm sure you won't struggle with this desk 🙂.
+- Memorizes up to 4 positions. So you can set your standing and sitting heights and you are still left with two additional positions that can be configured.
+- Memorized positions are extremely accurate. I have configured the sitting height to match the height of a different (fixed) desk in my office and it always matches its height very precisely.
+
+Cons:
+- It does end up wobbling a bit if you lean on it while standing. But with normal usage I don't find this a problem at all.
+- The feet on the bottom of the desk could mark up wood flooring. Easily solvable with felt pads.
+- Difficult to assemble completely solo - requires two people on the last step to turn the desk upside down.
+
+In regard to the actual usefulness of the standing desk, I genuinely could not be happier. As a software engineer, I spend a significant amount of time sitting in front of my computer, and at some point, my back inevitably suffers. Therefore, the ability to periodically switch to the standing position without interrupting my work is a game-changer.
