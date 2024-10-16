@@ -1,0 +1,28 @@
+---
+image: https://github.com/user-attachments/assets/16b5722f-e631-4baf-a97b-1d704766fbe7
+published_at: 2024-10-16
+tags: [Hack, Casa_Pronta, Bruteforce]
+---
+
+# How I hacked Casa Pronta: exposing property sale prices
+
+Casa Pronta is a platform that facilitates formal processes related to property transactions, including the creation of right-of-first-refusal notices, a legal requirement in certain transactions within Urban Rehabilitation Areas (ARU) in Portugal. Recently, while investigating its security, I discovered a vulnerability that allowed unauthorized users to access sensitive information about these transactions, **including the property's sale price**.
+
+.Example of notice in Casa Pronta portal
+image::https://github.com/user-attachments/assets/6fa2b25b-133e-4cea-bbbc-640db2e60c76[Example of notice in Casa Pronta portal,height=700]
+
+## The Vulnerability
+To access a right-of-first-refusal notice on Casa Pronta, users need two pieces of information: the notice number and the tax number (NIF/NIPC) of either the seller or the creator of the notice. While requiring a notice number may seem like a safeguard, they are generated sequentially. This means that **if you know the tax number** of either the seller or the creator of the notice, you can easily brute-force the sequential notice numbers by testing all combinations in the format `<sequential_id>/<year>` (e.g. `123456/2023`).
+
+.Form used to access a specific notice.
+image::https://github.com/user-attachments/assets/16b5722f-e631-4baf-a97b-1d704766fbe7[Form used to access a specific notice.]
+
+Without any protections to block automated attempts, a script could easily cycle through possible numbers for a given year — about 180,000 annually — and retrieve sensitive information. Knowing the notice's date or month could speed up this process, allowing access in less than a minute.
+
+.It is easy to plot the (almost) linear correlation between the date and the sequential ID of each notice.
+image::https://github.com/user-attachments/assets/86eb627d-8801-444c-9305-c71f7774f37b[Plot of the (almost) linear correlation between the date and the sequential ID of each notice.]
+
+## Exploit and mitigation
+I tested this vulnerability against a notice I created myself, using my NIF/NIPC and a brute-forced notice number to access personal details and sensitive transaction data. This information included the property's sale price, making it a privacy concern for anyone involved in the transaction.
+
+After reporting the issue to the Instituto dos Registos e do Notariado (IRN) on November 6, 2023, they acknowledged the problem. Since then, the vulnerability has been mitigated by introducing a **CAPTCHA mechanism**, effectively reducing the risk of brute-force attacks. Additionally, Casa Pronta updated the system to require that the tax number used corresponds to the person who submitted the notice, no longer accepting the seller's tax number.

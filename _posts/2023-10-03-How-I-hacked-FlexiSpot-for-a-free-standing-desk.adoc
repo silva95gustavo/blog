@@ -1,7 +1,7 @@
 ---
 image: https://github.com/silva95gustavo/blog/assets/3010353/c8ac313c-1cdc-41da-bfa4-0bfc3bb124f4
 published_at: 2023-10-03
-tags: [Flexispot]
+tags: [Hack, Flexispot]
 ---
 
 # How I hacked FlexiSpot for a free standing desk
