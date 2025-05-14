@@ -6,7 +6,7 @@ tags: [Hack, CDUP]
 
 # How I hacked the website of CDUP, the Sports Center of the University of Porto
 
-While checking the gym prices at CDUP, my friend http://diogomoura.me[Diogo Moura] noticed something unusual: a small square on the bottom-left corner that when clicked would display a bar sticking to the bottom of the screen.
+While checking the gym prices at CDUP, my friend https://diogomoura.me[Diogo Moura] noticed something unusual: a small square on the bottom-left corner that when clicked would display a bar sticking to the bottom of the screen.
 I didn't capture a screenshot so I recreated the page in Photoshop:
 
 .Homepage
@@ -14,7 +14,7 @@ image::https://user-images.githubusercontent.com/3010353/42350758-be761614-80a9-
 
 Diogo is a good guy so he stopped there.
 
-I started investigating that bar and noticed it was the http://phpdebugbar.com/[PHP Debug Bar], useful for debugging purposes during development. It contains some tabs with multiple information about everything that happens in the website. One of the features it provides is a list of the latest HTTP requests made by every user on the website:
+I started investigating that bar and noticed it was the https://phpdebugbar.com/[PHP Debug Bar], useful for debugging purposes during development. It contains some tabs with multiple information about everything that happens in the website. One of the features it provides is a list of the latest HTTP requests made by every user on the website:
 
 .Request list
 image::https://user-images.githubusercontent.com/3010353/42350574-00b2783e-80a9-11e8-82a1-94794205a59f.png[Request list]
@@ -29,7 +29,7 @@ Obviously, this is a big security issue, since I could trace the actions in the 
 }
 ....
 
-So I went to the http://cdup.up.pt/admin[administrator login form] and successfully logged in with the credentials I had just stolen. Now I had access to the backoffice of the whole website and I could manage users, edit content, etc.
+So I went to the https://cdup.up.pt/admin[administrator login form] and successfully logged in with the credentials I had just stolen. Now I had access to the backoffice of the whole website and I could manage users, edit content, etc.
 
 .Editing an entry in the backoffice
 image::https://user-images.githubusercontent.com/3010353/42350573-00843f64-80a9-11e8-9b70-a8b23d565e33.png[Editing an entry in the backoffice]

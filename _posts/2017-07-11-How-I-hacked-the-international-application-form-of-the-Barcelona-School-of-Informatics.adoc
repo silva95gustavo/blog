@@ -6,7 +6,7 @@ tags: [Hack, FIB, SQL_Injection]
 
 # How I hacked the international application form of the Barcelona School of Informatics
 
-As part of the incoming admission procedure of my Erasmus destination institution, http://www.fib.upc.edu/[Barcelona School of Informatics], an application form had to be filled with information about me and the courses I planned on attending.
+As part of the incoming admission procedure of my Erasmus destination institution, https://www.fib.upc.edu/[Barcelona School of Informatics], an application form had to be filled with information about me and the courses I planned on attending.
 
 Therefore, there is a section of the form where students can choose from a drop-down list the courses they want to attend. When the "Add" button is pressed, an asynchronous request is sent to the server and the course gets added to the table.
 
