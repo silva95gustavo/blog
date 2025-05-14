@@ -8,7 +8,7 @@
 # For technical reasons, this file is *NOT* reloaded automatically when you use
 # 'bundle exec jekyll serve'. If you change this file, please restart the server process.
 #
-# If you need help with YAML syntax, here are some quick references for you: 
+# If you need help with YAML syntax, here are some quick references for you:
 # https://learn-the-web.algonquindesign.ca/topics/markdown-yaml-cheat-sheet/#yaml
 # https://learnxinyminutes.com/docs/yaml/
 #
@@ -23,7 +23,7 @@ email: silva95gustavo@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   My personal blog!
 baseurl: "/blog" # the subpath of your site, e.g. /blog
-url: "https://gustavosilva.me/" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://gustavosilva.me" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: &twitterUsername silva95gustavo
 github_username: &githubUsername silva95gustavo
 
@@ -45,7 +45,7 @@ plainwhite:
     - title: Blog
       url: "/blog"
   show_excerpts: true
-  portfolio_image:  "assets/portfolio.png"
+  portfolio_image: "assets/portfolio.png"
 
 plugins:
   - jekyll-asciidoc
