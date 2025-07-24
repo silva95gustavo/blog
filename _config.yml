@@ -23,7 +23,7 @@ email: silva95gustavo@gmail.com
 description: >- # this means to ignore newlines until "baseurl:"
   My personal blog!
 baseurl: "/blog" # the subpath of your site, e.g. /blog
-url: "https://gustavosilva.me" # the base hostname & protocol for your site, e.g. http://example.com
+url: "https://www.gustavosilva.me" # the base hostname & protocol for your site, e.g. http://example.com
 twitter_username: &twitterUsername silva95gustavo
 github_username: &githubUsername silva95gustavo
 
