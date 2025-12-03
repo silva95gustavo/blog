@@ -70,7 +70,7 @@ await crawler.run(
 await Actor.exit();
 ```
 
-This sends 100 valid votes in seconds without triggering any meaningful protection.
+This sends 100 valid votes in a short period of time without triggering any meaningful protection.
 
 From the poll's perspective, these requests look like they are coming from different real users.
 
