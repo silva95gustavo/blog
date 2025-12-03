@@ -1,5 +1,5 @@
 ---
-image: https://github.com/user-attachments/assets/b21caa69-7263-48aa-9099-05b4f56dc965
+image: https://github.com/user-attachments/assets/d153f889-83d2-4ea6-8d6a-37e91ab35267
 published_at: 2025-12-03
 tags: [Hack, Polls, Elections, Manipulation, Bot]
 ---
@@ -8,7 +8,7 @@ tags: [Hack, Polls, Elections, Manipulation, Bot]
 
 Jornal de Notícias published an online poll asking readers to decide who won a 1:1 debate for the Portuguese presidential elections.
 
-image::https://github.com/user-attachments/assets/b21caa69-7263-48aa-9099-05b4f56dc965[Jornal de Notícias debate poll,height=500]
+image::https://github.com/user-attachments/assets/d153f889-83d2-4ea6-8d6a-37e91ab35267[Jornal de Notícias debate poll,height=500]
 
 At first glance, it looks like a simple public opinion snapshot. In practice, it is **trivially easy to manipulate**.
 
